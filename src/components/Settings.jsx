@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSettings, saveSettings } from '../db/settings'
+import { applyTheme } from '../utils/theme'
 import { buildReceipt, sampleOrder, columnsFor } from '../utils/receipt'
 import { encodeReceipt } from '../printer/escpos'
 import {
@@ -13,6 +14,7 @@ import {
 import './Settings.css'
 
 function SettingsForm({ settings }) {
+  const [theme, setTheme] = useState(settings.theme || 'system')
   const [businessName, setBusinessName] = useState(settings.businessName)
   const [receiptHeader, setReceiptHeader] = useState(settings.receiptHeader)
   const [receiptFooter, setReceiptFooter] = useState(settings.receiptFooter)
@@ -23,6 +25,12 @@ function SettingsForm({ settings }) {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
+  const handleThemeChange = async (nextTheme) => {
+    setTheme(nextTheme)
+    applyTheme(nextTheme)
+    await saveSettings({ theme: nextTheme })
+  }
+
   const handleSave = async (e) => {
     e.preventDefault()
     setError('')
@@ -31,6 +39,7 @@ function SettingsForm({ settings }) {
       receiptHeader,
       receiptFooter,
       paperWidth,
+      theme,
     })
     setStatus('Settings saved.')
   }
@@ -72,6 +81,46 @@ function SettingsForm({ settings }) {
     <div className="settings">
       <form onSubmit={handleSave}>
         <section>
+          <h2>Appearance</h2>
+
+          <fieldset>
+            <legend>Theme</legend>
+            <div className="row">
+              <label className="inline">
+                <input
+                  type="radio"
+                  name="theme"
+                  value="light"
+                  checked={theme === 'light'}
+                  onChange={() => handleThemeChange('light')}
+                />
+                Light
+              </label>
+              <label className="inline">
+                <input
+                  type="radio"
+                  name="theme"
+                  value="dark"
+                  checked={theme === 'dark'}
+                  onChange={() => handleThemeChange('dark')}
+                />
+                Dark
+              </label>
+              <label className="inline">
+                <input
+                  type="radio"
+                  name="theme"
+                  value="system"
+                  checked={theme === 'system'}
+                  onChange={() => handleThemeChange('system')}
+                />
+                System default
+              </label>
+            </div>
+          </fieldset>
+        </section>
+
+        <section>
           <h2>Receipt</h2>
 
           <label>
@@ -95,14 +144,16 @@ function SettingsForm({ settings }) {
 
           <fieldset>
             <legend>Paper width</legend>
-            <label className="inline">
-              <input type="radio" checked={paperWidth === 58} onChange={() => setPaperWidth(58)} />
-              58 mm
-            </label>
-            <label className="inline">
-              <input type="radio" checked={paperWidth === 80} onChange={() => setPaperWidth(80)} />
-              80 mm
-            </label>
+            <div className="row">
+              <label className="inline">
+                <input type="radio" checked={paperWidth === 58} onChange={() => setPaperWidth(58)} />
+                58 mm
+              </label>
+              <label className="inline">
+                <input type="radio" checked={paperWidth === 80} onChange={() => setPaperWidth(80)} />
+                80 mm
+              </label>
+            </div>
           </fieldset>
 
           <button type="submit" className="primary">Save</button>

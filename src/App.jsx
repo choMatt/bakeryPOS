@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from './db/db'
 import { needsAttention } from './db/inventory'
+import { useSettings } from './db/settings'
+import { applyTheme } from './utils/theme'
 import Checkout from './components/Checkout'
 import ProductManager from './components/ProductManager'
 import Orders from './components/Orders'
@@ -19,6 +21,13 @@ const TABS = [
 
 export default function App() {
   const [tab, setTab] = useState('pos')
+  const settings = useSettings()
+
+  useEffect(() => {
+    if (settings?.theme) {
+      applyTheme(settings.theme)
+    }
+  }, [settings?.theme])
 
   const alertCount = useLiveQuery(
     async () => (await db.products.toArray()).filter(needsAttention).length,

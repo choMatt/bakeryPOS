@@ -17,7 +17,12 @@
 }
 .settings h2 { margin: 0; }
 .settings label { display: flex; flex-direction: column; gap: 4px; }
-.settings label.inline { flex-direction: row; align-items: center; gap: 8px; }
+.settings label.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
 .settings input:not([type]),
 .settings textarea {
   padding: 8px;
@@ -25,7 +30,16 @@
   border: 1px solid var(--border);
   border-radius: 6px;
 }
-.settings fieldset { border: 1px solid var(--border); border-radius: 6px; }
+.settings fieldset {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+.settings fieldset legend {
+  padding: 0 4px;
+  font-weight: 500;
+  color: var(--text-h);
+}
 .settings button {
   padding: 8px 14px;
   font: inherit;
@@ -42,7 +56,7 @@
   align-self: flex-start;
 }
 .settings button:disabled { opacity: 0.5; cursor: not-allowed; }
-.settings .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings .row { display: flex; flex-wrap: wrap; gap: 16px; }
 .settings .hint { margin: 0; font-size: 14px; opacity: 0.75; }
 .settings .error { margin: 0; color: #c62828; }
 .settings .ok { margin: 0; color: #2e7d32; }
