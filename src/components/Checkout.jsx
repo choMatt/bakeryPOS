@@ -16,7 +16,9 @@ export default function Checkout() {
   const [error, setError] = useState('')
   const [lastSale, setLastSale] = useState(null)
   const [showReceipt, setShowReceipt] = useState(false)
-
+  const [open, setOpen] = useState(false)
+  const itemCount = cart.reduce((sum, i) => sum + i.qty, 0)
+  
   if (!products) return <p>Loading…</p>
 
   const visibleProducts = products.filter((p) => p.isActive)
@@ -82,6 +84,7 @@ export default function Checkout() {
       setLastSale(order)
       setCart([])
       setTendered('')
+      setOpen(true)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -124,7 +127,35 @@ export default function Checkout() {
 
       </section>
 
-      <aside className="cart">
+      <div
+        className={open ? 'cart-backdrop show' : 'cart-backdrop'}
+        onClick={() => setOpen(false)}
+      />
+
+      <aside className={open ? 'cart open' : 'cart'}>
+        <button
+           type="button"
+           className="cart-peek"
+           onClick={() => setOpen((o) => !o)}
+           aria-expanded={open}
+           aria-controls="cart-body"
+           aria-label={open ? 'Collapse order' : 'Expand order'}
+         >
+           <span className="peek-arrow">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M6 15l6-6 6 6" />
+             </svg>
+           </span>
+           <span className="peek-info">
+             <span className="peek-count">
+               {itemCount} item{itemCount === 1 ? '' : 's'}
+             </span>
+             <strong className="peek-total">{formatPrice(total)}</strong>
+           </span>
+        </button>
+
+        <div className="cart-body" id="cart-body" inert={!open}>
         <h2>Current order</h2>
 
         {lastSale && (
@@ -227,6 +258,7 @@ export default function Checkout() {
           <button className="primary" onClick={completeSale} disabled={!canComplete}>
             {saving ? 'Saving…' : `Complete sale ${total > 0 ? formatPrice(total) : ''}`}
           </button>
+          </div>
         </div>
         {showReceipt && lastSale && (
           <ReceiptDialog order={lastSale} onClose={() => setShowReceipt(false)} />
