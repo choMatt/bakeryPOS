@@ -8,10 +8,7 @@ import './Checkout.css'
 import { isTracked, stockStatus } from '../db/inventory'
 
 export default function Checkout() {
-  const categories = useLiveQuery(() => db.categories.orderBy('sortOrder').toArray(), [])
   const products = useLiveQuery(() => db.products.orderBy('name').toArray(), [])
-
-  const [categoryFilter, setCategoryFilter] = useState('all')
   const [cart, setCart] = useState([]) // [{ productId, name, price, qty }]
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [tendered, setTendered] = useState('')
@@ -19,25 +16,21 @@ export default function Checkout() {
   const [error, setError] = useState('')
   const [lastSale, setLastSale] = useState(null)
   const [showReceipt, setShowReceipt] = useState(false)
-  
-  if (!categories || !products) return <p>Loading…</p>
 
-  const visibleProducts = products.filter(
-    (p) =>
-      p.isActive &&
-      (categoryFilter === 'all' || p.categoryId === categoryFilter),
-  )
+  if (!products) return <p>Loading…</p>
+
+  const visibleProducts = products.filter((p) => p.isActive)
 
   const qtyInCart = (id) => cart.find((i) => i.productId === id)?.qty ?? 0
 
   const productById = (id) => products.find((p) => p.id === id)
-  
+
   // Untracked products are unlimited; tracked ones stop at the stock count
   const canAddMore = (id) => {
     const p = productById(id)
     return !p || !isTracked(p) || qtyInCart(id) < (p.stock ?? 0)
   }
-  
+
   const addToCart = (product) => {
     if (!canAddMore(product.id)) return
     setLastSale(null)
@@ -63,7 +56,7 @@ export default function Checkout() {
         .filter((i) => i.qty > 0),
     )
   }
-  
+
   const removeItem = (productId) =>
     setCart((prev) => prev.filter((i) => i.productId !== productId))
 
@@ -99,24 +92,6 @@ export default function Checkout() {
   return (
     <div className="checkout">
       <section className="catalog">
-        <div className="category-tabs">
-          <button
-            className={categoryFilter === 'all' ? 'active' : ''}
-            onClick={() => setCategoryFilter('all')}
-          >
-            All
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              className={categoryFilter === c.id ? 'active' : ''}
-              onClick={() => setCategoryFilter(c.id)}
-            >
-              {c.name}
-            </button>
-          ))}
-        </div>
-
         {visibleProducts.length === 0 ? (
           <p className="empty">No products to show. Add some in the Products tab.</p>
         ) : (
@@ -162,7 +137,7 @@ export default function Checkout() {
             <button onClick={() => setShowReceipt(true)}>Print receipt</button>
           </div>
         )}
-        
+
         {cart.length === 0 ? (
           <p className="empty">Tap a product to add it.</p>
         ) : (
@@ -187,7 +162,7 @@ export default function Checkout() {
                 <button className="remove" onClick={() => removeItem(i.productId)} aria-label="Remove">
                   ✕
                 </button>
-                
+
               </li>
             ))}
           </ul>

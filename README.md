@@ -17,7 +17,6 @@ The system is designed to manage bakery products, process orders, track sales, a
 ## Features
 
 * Product management
-* Product categories
 * Create customer orders
 * Calculate totals
 * Track sales
@@ -76,7 +75,6 @@ Dexie is used to make working with IndexedDB easier.
 Example data stored locally may include:
 
 * Products
-* Categories
 * Orders
 * Sales
 * Settings

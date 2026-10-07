@@ -14,16 +14,12 @@ const formatPrice = (centavos) =>
   })}`
 
 export default function ProductManager() {
-  const categories = useLiveQuery(() => db.categories.orderBy('sortOrder').toArray(), [])
   const products = useLiveQuery(() => db.products.orderBy('name').toArray(), [])
 
   // null = form closed, 'new' = adding, product object = editing
   const [editing, setEditing] = useState(null)
 
-  if (!categories || !products) return <p>Loading…</p>
-
-  const categoryName = (id) => categories.find((c) => c.id === id)?.name ?? '—'
-
+  if (!products) return <p>Loading…</p>
   const handleSave = async (data) => {
     if (editing === 'new') await addProduct(data)
     else await updateProduct(editing.id, data)
@@ -47,7 +43,6 @@ export default function ProductManager() {
         <ProductForm
           key={editing === 'new' ? 'new' : editing.id}
           product={editing === 'new' ? null : editing}
-          categories={categories}
           onSave={handleSave}
           onCancel={() => setEditing(null)}
         />
@@ -62,7 +57,6 @@ export default function ProductManager() {
               <div className="info">
                 <strong>{p.name}</strong>
                 <span>
-                  {categoryName(p.categoryId)} ·{' '}
                   {p.saleType === 'box' ? `Box of ${p.boxSize}` : 'Individual'}
                   {isTracked(p) && ` · ${p.stock ?? 0} in stock`}
                   {!p.isActive && ' · Unavailable'}

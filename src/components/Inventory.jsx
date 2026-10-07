@@ -13,7 +13,7 @@ import './Inventory.css'
 const SEVERITY = { out: 0, low: 1, ok: 2 }
 const STATUS_LABEL = { out: 'Out of stock', low: 'Low stock', ok: 'In stock' }
 
-function StockRow({ product, categoryName }) {
+function StockRow({ product }) {
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
   const status = stockStatus(product)
@@ -47,7 +47,7 @@ function StockRow({ product, categoryName }) {
       <div className="info">
         <strong>{product.name}</strong>
         <span>
-          {categoryName} · {product.saleType === 'box' ? `Box of ${product.boxSize}` : 'Individual'}
+          {product.saleType === 'box' ? `Box of ${product.boxSize}` : 'Individual'}
           {!product.isActive && ' · Unavailable'}
         </span>
       </div>
@@ -79,13 +79,9 @@ function StockRow({ product, categoryName }) {
 
 export default function Inventory() {
   const [filter, setFilter] = useState('all') // 'all' | 'low'
-  const categories = useLiveQuery(() => db.categories.toArray(), [])
   const products = useLiveQuery(() => db.products.toArray(), [])
 
-  if (!categories || !products) return <p>Loading…</p>
-
-  const categoryName = (id) => categories.find((c) => c.id === id)?.name ?? '—'
-
+  if (!products) return <p>Loading…</p>
   const tracked = products.filter(isTracked)
   const attention = tracked.filter(needsAttention)
   const outCount = attention.filter((p) => stockStatus(p) === 'out').length
@@ -141,7 +137,7 @@ export default function Inventory() {
       ) : (
         <ul className="stock-list">
           {shown.map((p) => (
-            <StockRow key={p.id} product={p} categoryName={categoryName(p.categoryId)} />
+            <StockRow key={p.id} product={p} />
           ))}
         </ul>
       )}

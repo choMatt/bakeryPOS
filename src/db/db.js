@@ -11,25 +11,15 @@ db.version(1).stores({
 })
 
 // Runs once, when the database is first created.
-db.on('populate', (tx) => {
-  const defaultCategories = [
-    { name: 'Cookies', sortOrder: 1 },
-    { name: 'Crinkles', sortOrder: 2 },
-    { name: 'Brownies', sortOrder: 3 },
-    { name: 'Boxed Assortments', sortOrder: 4 },
-  ]
-  
-  const defaultSettings = [
+db.on('populate', () => {
+const defaultSettings = [
     { key: 'businessName', value: 'My Bakery' },
     { key: 'currency', value: 'PHP' },
     { key: 'currencySymbol', value: '₱' },
   ]
-  
+
   db.on('ready', async () => {
-    if ((await db.categories.count()) === 0) {
-      await db.categories.bulkAdd(defaultCategories)
-    }
-    if ((await db.settings.count()) === 0) {
+if ((await db.settings.count()) === 0) {
       await db.settings.bulkAdd(defaultSettings)
     }
   })

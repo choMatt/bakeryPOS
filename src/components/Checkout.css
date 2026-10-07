@@ -24,8 +24,6 @@
   color: #fff;
 }
 
-.category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

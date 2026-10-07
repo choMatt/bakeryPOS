@@ -3,10 +3,9 @@ import { DEFAULT_LOW_STOCK } from '../db/inventory'
 const toPesos = (centavos) => (centavos / 100).toFixed(2)
 const isWholeNumber = (v) => v !== '' && Number.isInteger(Number(v)) && Number(v) >= 0
 
-export default function ProductForm({ product, categories, onSave, onCancel }) {
+export default function ProductForm({ product, onSave, onCancel }) {
   const [name, setName] = useState(product?.name ?? '')
   const [price, setPrice] = useState(product ? toPesos(product.price) : '')
-  const [categoryId, setCategoryId] = useState(product?.categoryId ?? '')
   const [saleType, setSaleType] = useState(product?.saleType ?? 'single')
   const [boxSize, setBoxSize] = useState(product?.boxSize ?? 6)
   const [isActive, setIsActive] = useState(product?.isActive ?? true)
@@ -23,7 +22,6 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
 
     if (!trimmed) return setError('Name is required.')
     if (Number.isNaN(pesos) || pesos < 0) return setError('Enter a valid price.')
-    if (!categoryId) return setError('Choose a category.')
     if (saleType === 'box' && (!Number.isInteger(+boxSize) || +boxSize < 2)) {
       return setError('Box size must be a whole number of 2 or more.')
     }
@@ -37,7 +35,6 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
     onSave({
       name: trimmed,
       price: Math.round(pesos * 100), // store as centavos
-      categoryId: Number(categoryId),
       saleType,
       boxSize: saleType === 'box' ? Number(boxSize) : null,
       isActive,
@@ -66,16 +63,6 @@ export default function ProductForm({ product, categories, onSave, onCancel }) {
           value={price}
           onChange={(e) => setPrice(e.target.value)}
         />
-      </label>
-
-      <label>
-        Category
-        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-          <option value="">Select…</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
       </label>
 
       <fieldset>
