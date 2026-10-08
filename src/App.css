@@ -31,7 +31,6 @@
   max-width: 526px; /* matches #root so it lines up on wide screens */
   box-sizing: border-box;
   padding: 10px 16px calc(30px + env(safe-area-inset-bottom));
-  border-radius: 28px 28px 0 0;
   background: var(--bg);
   border-bottom: none;
   box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.10);
