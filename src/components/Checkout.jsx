@@ -68,8 +68,7 @@ export default function Checkout() {
     setError('')
   }
 
-  const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0)
-  const total = subtotal
+  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   const amountPaid = paymentMethod === 'cash' ? toCentavos(tendered) : total
   const hasValidPayment = paymentMethod !== 'cash' || (!Number.isNaN(amountPaid) && amountPaid >= total)
@@ -127,10 +126,7 @@ export default function Checkout() {
 
       </section>
 
-      <div
-        className={open ? 'cart-backdrop show' : 'cart-backdrop'}
-        onClick={() => setOpen(false)}
-      />
+
 
       <aside className={open ? 'cart open' : 'cart'}>
         <button
@@ -200,8 +196,10 @@ export default function Checkout() {
         )}
 
         <div className="totals">
-          <div><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
-          <div className="grand"><span>Total</span><span>{formatPrice(total)}</span></div>
+          <div className="grand">
+            <span>Total</span>
+            <span>{formatPrice(total)}</span>
+          </div>
         </div>
 
         <div className="payment">
