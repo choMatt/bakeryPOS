@@ -70,12 +70,12 @@
   box-sizing: border-box;
   background: var(--bg);
   border: 1px solid var(--border);
+  border-radius: 24px;
   border-bottom: none;
   box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
 
-
   transform: translateY(calc(100% - var(--peek-h)));
-  transition: transform 0.80s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
 }
 
@@ -99,6 +99,10 @@
   border-radius: 24px 24px 0 0;
   background: transparent;
   text-align: left;
+}
+
+.cart.empty-cart {
+  transform: translateY(100%);
 }
 
 .peek-arrow {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { createOrder } from '../db/orders'
@@ -18,6 +18,12 @@ export default function Checkout() {
   const [showReceipt, setShowReceipt] = useState(false)
   const [open, setOpen] = useState(false)
   const itemCount = cart.reduce((sum, i) => sum + i.qty, 0)
+
+  useEffect(() => {
+    if (cart.length === 0) {
+      setOpen(false)
+    }
+  }, [cart.length])
   
   if (!products) return <p>Loading…</p>
 
@@ -91,6 +97,7 @@ export default function Checkout() {
     }
   }
 
+
   return (
     <div className="checkout">
       <section className="catalog">
@@ -128,7 +135,7 @@ export default function Checkout() {
 
 
 
-      <aside className={open ? 'cart open' : 'cart'}>
+      <aside className={`cart ${open ? 'open' : ''} ${cart.length === 0 ? 'empty-cart' : ''}`}>
         <button
            type="button"
            className="cart-peek"
