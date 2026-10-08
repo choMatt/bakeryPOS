@@ -1,5 +1,5 @@
 .checkout {
-  --nav-h: calc(60px + env(safe-area-inset-bottom));
+  --nav-h: calc(80px + env(safe-area-inset-bottom));
   --peek-h: 76px;
   padding: 16px;
   padding-bottom: calc(var(--peek-h) + 16px); /* so the last products aren't hidden */
@@ -73,13 +73,18 @@
   border-bottom: none;
   box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
 
-  transform: translateY(calc(97% - var(--peek-h)));
-  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+
+  transform: translateY(calc(100% - var(--peek-h)));
+  transition: transform 0.80s cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
 }
 
 .cart.open {
   transform: translateY(0);
+}
+
+.cart.open .peek-info {
+  display: none;
 }
 
 .checkout .cart-peek {
