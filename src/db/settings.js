@@ -6,7 +6,6 @@ export const DEFAULT_SETTINGS = {
   receiptHeader: '', // address / contact, one per line
   receiptFooter: 'Thank you! Come again.',
   paperWidth: 58, // mm: 58 or 80
-  theme: 'system', // 'system' | 'light' | 'dark'
 }
 
 export async function saveSettings(values) {
