@@ -17,11 +17,13 @@ export default function Checkout() {
   const [lastSale, setLastSale] = useState(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [open, setOpen] = useState(false)
+  const [view, setView] = useState('order')
   const itemCount = cart.reduce((sum, i) => sum + i.qty, 0)
 
   useEffect(() => {
     if (cart.length === 0) {
       setOpen(false)
+      setView('order')
     }
   }, [cart.length])
   
@@ -89,7 +91,8 @@ export default function Checkout() {
       setLastSale(order)
       setCart([])
       setTendered('')
-      setOpen(true)
+      setView('order')
+      setShowReceipt(true)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -159,110 +162,191 @@ export default function Checkout() {
         </button>
 
         <div className="cart-body" id="cart-body" inert={!open}>
-        <h2>Current order</h2>
-
-        {lastSale && (
-          <div className="sale-done">
-            <strong>Sale #{lastSale.id} completed</strong>
-            <span>Total {formatPrice(lastSale.total)}</span>
-            {lastSale.paymentMethod === 'cash' && (
-              <span>Change {formatPrice(lastSale.change)}</span>
-            )}
-            <button onClick={() => setShowReceipt(true)}>Print receipt</button>
-          </div>
-        )}
-
-        {cart.length === 0 ? (
-          <p className="empty">Tap a product to add it.</p>
-        ) : (
-          <ul className="cart-lines">
-            {cart.map((i) => (
-              <li key={i.productId}>
-                <div className="line-info">
-                  <span className="line-name">{i.name}</span>
-                  <span className="line-sub">
-                    {formatPrice(i.price)} × {i.qty} = {formatPrice(i.price * i.qty)}
-                  </span>
-                </div>
-                <div className="qty">
-                  <button onClick={() => changeQty(i.productId, -1)} aria-label="Decrease">−</button>
-                  <span>{i.qty}</span>
-                  <button
-                    onClick={() => changeQty(i.productId, 1)}
-                    disabled={!canAddMore(i.productId)}
-                    aria-label="Increase"
-                  >+</button>
-                </div>
-                <button className="remove" onClick={() => removeItem(i.productId)} aria-label="Remove">
-                  ✕
-                </button>
-
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="totals">
-          <div className="grand">
-            <span>Total</span>
-            <span>{formatPrice(total)}</span>
-          </div>
-        </div>
-
-        <div className="payment">
-          <div className="method-toggle">
-            {['cash', 'gcash'].map((m) => (
-              <button
-                key={m}
-                className={paymentMethod === m ? 'active' : ''}
-                onClick={() => setPaymentMethod(m)}
-              >
-                {m === 'cash' ? 'Cash' : 'GCash'}
-              </button>
-            ))}
-          </div>
-
-          {paymentMethod === 'cash' && (
-            <>
-              <label>
-                Amount received (₱)
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  value={tendered}
-                  onChange={(e) => setTendered(e.target.value)}
-                />
-              </label>
-              <div className="quick-cash">
-                <button onClick={() => setTendered((total / 100).toFixed(2))} disabled={total === 0}>
-                  Exact
-                </button>
-                {[100, 500, 1000].map((amt) => (
-                  <button key={amt} onClick={() => setTendered(String(amt))}>₱{amt}</button>
-                ))}
-              </div>
-              {tendered !== '' && (
-                <div className={`change ${hasValidPayment ? '' : 'short'}`}>
-                  {hasValidPayment
-                    ? `Change: ${formatPrice(change)}`
-                    : `Short by ${formatPrice(total - (amountPaid || 0))}`}
+          <div className={`cart-views ${view === 'checkout' ? 'show-checkout' : ''}`}>
+        
+            {/* ORDER VIEW */}
+            <div className="cart-view order-view">
+        
+              <h2>Current order</h2>
+        
+              {lastSale && (
+                <div className="sale-done">
+                  <strong>Sale #{lastSale.id} completed</strong>
+                  <span>Total {formatPrice(lastSale.total)}</span>
+        
+                  {lastSale.paymentMethod === 'cash' && (
+                    <span>Change {formatPrice(lastSale.change)}</span>
+                  )}
+        
+                  <button onClick={() => setShowReceipt(true)}>
+                    Print receipt
+                  </button>
                 </div>
               )}
-            </>
-          )}
-        </div>
-
-        {error && <p className="error">{error}</p>}
-
-        <div className="cart-actions">
-          <button className="secondary" onClick={clearCart} disabled={cart.length === 0}>
-            Clear
-          </button>
-          <button className="primary" onClick={completeSale} disabled={!canComplete}>
-            {saving ? 'Saving…' : `Complete sale ${total > 0 ? formatPrice(total) : ''}`}
-          </button>
+        
+              {cart.length === 0 ? (
+                <p className="empty">Tap a product to add it.</p>
+              ) : (
+                <ul className="cart-lines">
+                  {cart.map((i) => (
+                    <li key={i.productId}>
+                      <div className="line-info">
+                        <span className="line-name">{i.name}</span>
+        
+                        <span className="line-sub">
+                          {formatPrice(i.price)} × {i.qty} = {formatPrice(i.price * i.qty)}
+                        </span>
+                      </div>
+        
+                      <div className="qty">
+                        <button
+                          onClick={() => changeQty(i.productId, -1)}
+                          aria-label="Decrease"
+                        >
+                          −
+                        </button>
+        
+                        <span>{i.qty}</span>
+        
+                        <button
+                          onClick={() => changeQty(i.productId, 1)}
+                          disabled={!canAddMore(i.productId)}
+                          aria-label="Increase"
+                        >
+                          +
+                        </button>
+                      </div>
+        
+                      <button
+                        className="remove"
+                        onClick={() => removeItem(i.productId)}
+                        aria-label="Remove"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+        
+              <div className="totals">
+                <div className="grand">
+                  <span>Total</span>
+                  <span>{formatPrice(total)}</span>
+                </div>
+              </div>
+        
+              <div className="cart-actions">
+                <button
+                  className="secondary"
+                  onClick={clearCart}
+                  disabled={cart.length === 0}
+                >
+                  Clear
+                </button>
+        
+                <button
+                  className="primary"
+                  onClick={() => setView('checkout')}
+                  disabled={cart.length === 0}
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
+        
+            </div>
+        
+        
+            {/* CHECKOUT VIEW */}
+            <div className="cart-view checkout-view">
+        
+              <button
+                className="back-button"
+                onClick={() => setView('order')}
+              >
+                ← Back to Order
+              </button>
+        
+              <h2>Checkout</h2>
+        
+              <div className="checkout-total">
+                <span>Total</span>
+                <strong>{formatPrice(total)}</strong>
+              </div>
+        
+              <div className="payment">
+        
+                <div className="method-toggle">
+                  {['cash', 'gcash'].map((m) => (
+                    <button
+                      key={m}
+                      className={paymentMethod === m ? 'active' : ''}
+                      onClick={() => setPaymentMethod(m)}
+                    >
+                      {m === 'cash' ? 'Cash' : 'GCash'}
+                    </button>
+                  ))}
+                </div>
+        
+                {paymentMethod === 'cash' && (
+                  <>
+                    <label>
+                      Amount received (₱)
+        
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        step="0.01"
+                        value={tendered}
+                        onChange={(e) => setTendered(e.target.value)}
+                      />
+                    </label>
+        
+                    <div className="quick-cash">
+                      <button
+                        onClick={() => setTendered((total / 100).toFixed(2))}
+                        disabled={total === 0}
+                      >
+                        Exact
+                      </button>
+        
+                      {[100, 500, 1000].map((amt) => (
+                        <button
+                          key={amt}
+                          onClick={() => setTendered(String(amt))}
+                        >
+                          ₱{amt}
+                        </button>
+                      ))}
+                    </div>
+        
+                    {tendered !== '' && (
+                      <div className={`change ${hasValidPayment ? '' : 'short'}`}>
+                        {hasValidPayment
+                          ? `Change: ${formatPrice(change)}`
+                          : `Short by ${formatPrice(total - (amountPaid || 0))}`}
+                      </div>
+                    )}
+                  </>
+                )}
+        
+              </div>
+        
+              {error && <p className="error">{error}</p>}
+        
+              <button
+                className="primary checkout-complete"
+                onClick={completeSale}
+                disabled={!canComplete}
+              >
+                {saving
+                  ? 'Saving…'
+                  : `Complete Sale ${total > 0 ? formatPrice(total) : ''}`}
+              </button>
+        
+            </div>
+        
           </div>
         </div>
         {showReceipt && lastSale && (
