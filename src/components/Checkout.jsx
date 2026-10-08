@@ -210,7 +210,7 @@ function OrderView({
             onClick={() => setView('checkout')}
             disabled={cart.length === 0}
           >
-            Proceed to Checkout
+            Checkout
           </button>
         </div>
       </div>
