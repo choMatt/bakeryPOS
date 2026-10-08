@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useSettings, saveSettings } from '../db/settings'
-import { applyTheme } from '../utils/theme'
 import { buildReceipt, sampleOrder, columnsFor } from '../utils/receipt'
 import { encodeReceipt } from '../printer/escpos'
 import {
@@ -14,7 +13,6 @@ import {
 import './Settings.css'
 
 function SettingsForm({ settings }) {
-  const [theme, setTheme] = useState(settings.theme || 'system')
   const [businessName, setBusinessName] = useState(settings.businessName)
   const [receiptHeader, setReceiptHeader] = useState(settings.receiptHeader)
   const [receiptFooter, setReceiptFooter] = useState(settings.receiptFooter)
@@ -25,12 +23,6 @@ function SettingsForm({ settings }) {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
-  const handleThemeChange = async (nextTheme) => {
-    setTheme(nextTheme)
-    applyTheme(nextTheme)
-    await saveSettings({ theme: nextTheme })
-  }
-
   const handleSave = async (e) => {
     e.preventDefault()
     setError('')
@@ -39,7 +31,6 @@ function SettingsForm({ settings }) {
       receiptHeader,
       receiptFooter,
       paperWidth,
-      theme,
     })
     setStatus('Settings saved.')
   }
@@ -80,46 +71,6 @@ function SettingsForm({ settings }) {
   return (
     <div className="settings">
       <form onSubmit={handleSave}>
-        <section>
-          <h2>Appearance</h2>
-
-          <fieldset>
-            <legend>Theme</legend>
-            <div className="row">
-              <label className="inline">
-                <input
-                  type="radio"
-                  name="theme"
-                  value="light"
-                  checked={theme === 'light'}
-                  onChange={() => handleThemeChange('light')}
-                />
-                Light
-              </label>
-              <label className="inline">
-                <input
-                  type="radio"
-                  name="theme"
-                  value="dark"
-                  checked={theme === 'dark'}
-                  onChange={() => handleThemeChange('dark')}
-                />
-                Dark
-              </label>
-              <label className="inline">
-                <input
-                  type="radio"
-                  name="theme"
-                  value="system"
-                  checked={theme === 'system'}
-                  onChange={() => handleThemeChange('system')}
-                />
-                System default
-              </label>
-            </div>
-          </fieldset>
-        </section>
-
         <section>
           <h2>Receipt</h2>
 
