@@ -7,8 +7,11 @@
   --peek-h: 76px;
 
   padding: 16px;
-  padding-bottom: calc(var(--peek-h) + 16px);
   text-align: left;
+}
+
+.checkout.has-cart {
+  padding-bottom: calc(var(--peek-h) + 16px);
 }
 
 
