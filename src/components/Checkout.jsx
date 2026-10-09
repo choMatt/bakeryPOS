@@ -112,7 +112,17 @@ function OrderView({
   canAddMore,
   clearCart,
   setShowReceipt,
-  setView,
+  paymentMethod,
+  setPaymentMethod,
+  tendered,
+  setTendered,
+  amountPaid,
+  hasValidPayment,
+  change,
+  error,
+  saving,
+  canComplete,
+  completeSale,
 }) {
   return (
     <div className="cart-view order-view">
@@ -121,15 +131,10 @@ function OrderView({
       {lastSale && (
         <div className="sale-done">
           <strong>Sale #{lastSale.id} completed</strong>
-
-          <span>
-            Total {formatPrice(lastSale.total)}
-          </span>
+          <span>Total {formatPrice(lastSale.total)}</span>
 
           {lastSale.paymentMethod === 'cash' && (
-            <span>
-              Change {formatPrice(lastSale.change)}
-            </span>
+            <span>Change {formatPrice(lastSale.change)}</span>
           )}
 
           <button onClick={() => setShowReceipt(true)}>
@@ -139,18 +144,13 @@ function OrderView({
       )}
 
       {cart.length === 0 ? (
-        <p className="empty">
-          Tap a product to add it.
-        </p>
+        <p className="empty">Tap a product to add it.</p>
       ) : (
         <ul className="cart-lines">
           {cart.map((item) => (
             <li key={item.productId}>
               <div className="line-info">
-                <span className="line-name">
-                  {item.name}
-                </span>
-
+                <span className="line-name">{item.name}</span>
                 <span className="line-sub">
                   {formatPrice(item.price)} × {item.qty} ={' '}
                   {formatPrice(item.price * item.qty)}
@@ -196,21 +196,83 @@ function OrderView({
           </div>
         </div>
 
+        <div className="payment">
+          <div className="method-toggle">
+            {['cash', 'gcash'].map((method) => (
+              <button
+                key={method}
+                className={paymentMethod === method ? 'active' : ''}
+                onClick={() => setPaymentMethod(method)}
+              >
+                {method === 'cash' ? 'Cash' : 'GCash'}
+              </button>
+            ))}
+          </div>
+
+          {paymentMethod === 'cash' && (
+            <>
+              <label>
+                Amount received (₱)
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={tendered}
+                  onChange={(event) => setTendered(event.target.value)}
+                />
+              </label>
+
+              <div className="quick-cash">
+                <button
+                  onClick={() => setTendered((total / 100).toFixed(2))}
+                  disabled={total === 0}
+                >
+                  Exact
+                </button>
+
+                {[100, 500, 1000].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => setTendered(String(amount))}
+                  >
+                    ₱{amount}
+                  </button>
+                ))}
+              </div>
+
+              {tendered !== '' && (
+                <div className={`change ${hasValidPayment ? '' : 'short'}`}>
+                  {hasValidPayment
+                    ? `Change: ${formatPrice(change)}`
+                    : `Short by ${formatPrice(
+                        total - (amountPaid || 0),
+                      )}`}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {error && <p className="error">{error}</p>}
+
         <div className="cart-actions">
           <button
             className="secondary"
             onClick={clearCart}
-            disabled={cart.length === 0}
+            disabled={cart.length === 0 || saving}
           >
             Clear
           </button>
 
           <button
             className="primary"
-            onClick={() => setView('checkout')}
-            disabled={cart.length === 0}
+            onClick={completeSale}
+            disabled={!canComplete}
           >
-            Checkout
+            {saving
+              ? 'Saving…'
+              : `Complete Sale ${total > 0 ? formatPrice(total) : ''}`}
           </button>
         </div>
       </div>
@@ -219,114 +281,6 @@ function OrderView({
 }
 
 
-function CheckoutView({
-  total,
-  paymentMethod,
-  setPaymentMethod,
-  tendered,
-  setTendered,
-  amountPaid,
-  hasValidPayment,
-  change,
-  error,
-  saving,
-  canComplete,
-  completeSale,
-  setView,
-}) {
-  return (
-    <div className="cart-view checkout-view">
-      <button
-        className="back-button"
-        onClick={() => setView('order')}
-      >
-        ← Back to Order
-      </button>
-
-      <h2>Checkout</h2>
-
-      <div className="checkout-total">
-        <span>Total</span>
-        <strong>{formatPrice(total)}</strong>
-      </div>
-
-      <div className="payment">
-        <div className="method-toggle">
-          {['cash', 'gcash'].map((method) => (
-            <button
-              key={method}
-              className={paymentMethod === method ? 'active' : ''}
-              onClick={() => setPaymentMethod(method)}
-            >
-              {method === 'cash' ? 'Cash' : 'GCash'}
-            </button>
-          ))}
-        </div>
-
-        {paymentMethod === 'cash' && (
-          <>
-            <label>
-              Amount received (₱)
-
-              <input
-                type="number"
-                inputMode="decimal"
-                min="0"
-                step="0.01"
-                value={tendered}
-                onChange={(event) => setTendered(event.target.value)}
-              />
-            </label>
-
-            <div className="quick-cash">
-              <button
-                onClick={() => setTendered((total / 100).toFixed(2))}
-                disabled={total === 0}
-              >
-                Exact
-              </button>
-
-              {[100, 500, 1000].map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => setTendered(String(amount))}
-                >
-                  ₱{amount}
-                </button>
-              ))}
-            </div>
-
-            {tendered !== '' && (
-              <div className={`change ${hasValidPayment ? '' : 'short'}`}>
-                {hasValidPayment
-                  ? `Change: ${formatPrice(change)}`
-                  : `Short by ${formatPrice(
-                      total - (amountPaid || 0),
-                    )}`}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {error && (
-        <p className="error">{error}</p>
-      )}
-
-      <button
-        className="primary checkout-complete"
-        onClick={completeSale}
-        disabled={!canComplete}
-      >
-        {saving
-          ? 'Saving…'
-          : `Complete Sale ${
-              total > 0 ? formatPrice(total) : ''
-            }`}
-      </button>
-    </div>
-  )
-}
 
 
 export default function Checkout() {
@@ -343,7 +297,6 @@ export default function Checkout() {
   const [lastSale, setLastSale] = useState(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [open, setOpen] = useState(false)
-  const [view, setView] = useState('order')
 
   const itemCount = cart.reduce(
     (sum, item) => sum + item.qty,
@@ -353,7 +306,6 @@ export default function Checkout() {
   useEffect(() => {
     if (cart.length === 0) {
       setOpen(false)
-      setView('order')
     }
   }, [cart.length])
 
@@ -477,7 +429,6 @@ export default function Checkout() {
       setLastSale(order)
       setCart([])
       setTendered('')
-      setView('order')
       setShowReceipt(true)
     } catch (err) {
       setError(err.message)
@@ -517,13 +468,6 @@ export default function Checkout() {
           id="cart-body"
           inert={!open}
         >
-          <div
-            className={`cart-views ${
-              view === 'checkout'
-                ? 'show-checkout'
-                : ''
-            }`}
-          >
             <OrderView
               cart={cart}
               lastSale={lastSale}
@@ -533,11 +477,6 @@ export default function Checkout() {
               canAddMore={canAddMore}
               clearCart={clearCart}
               setShowReceipt={setShowReceipt}
-              setView={setView}
-            />
-
-            <CheckoutView
-              total={total}
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               tendered={tendered}
@@ -549,9 +488,7 @@ export default function Checkout() {
               saving={saving}
               canComplete={canComplete}
               completeSale={completeSale}
-              setView={setView}
             />
-          </div>
         </div>
 
         {showReceipt && lastSale && (
