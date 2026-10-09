@@ -553,14 +553,14 @@ export default function Checkout() {
             />
           </div>
         </div>
-      </aside>
 
-      {showReceipt && lastSale && (
-        <ReceiptDialog
-          order={lastSale}
-          onClose={() => setShowReceipt(false)}
-        />
-      )}
+        {showReceipt && lastSale && (
+          <ReceiptDialog
+            order={lastSale}
+            onClose={() => setShowReceipt(false)}
+          />
+        )}
+      </aside>
     </div>
   )
 }
