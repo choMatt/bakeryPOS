@@ -11,7 +11,6 @@
   text-align: left;
 }
 
-
 /* =========================================================
    SHARED BUTTONS
    ========================================================= */
@@ -37,7 +36,6 @@
   border-color: var(--accent);
   color: #fff;
 }
-
 
 /* =========================================================
    PRODUCT CATALOG
@@ -77,7 +75,6 @@
   font-weight: 600;
 }
 
-
 /* Product quantity badge */
 
 .product-tile .badge {
@@ -98,7 +95,6 @@
   font-size: 13px;
 }
 
-
 /* Product stock */
 
 .product-tile .stock {
@@ -118,7 +114,6 @@
   font-weight: 600;
 }
 
-
 /* =========================================================
    CART SHEET
    ========================================================= */
@@ -128,7 +123,6 @@
   left: 0;
   right: 0;
   bottom: var(--nav-h);
-  
 
   width: 100%;
   max-width: 1126px;
@@ -182,13 +176,11 @@
   transform: translateY(0);
 }
 
-
 /* Hide empty cart */
 
 .cart.empty-cart {
   transform: translateY(500%);
 }
-
 
 /* =========================================================
    CART PEEK / HANDLE
@@ -217,7 +209,6 @@
   display: none;
 }
 
-
 /* Arrow */
 
 .peek-arrow {
@@ -239,7 +230,6 @@
   transform: rotate(180deg);
 }
 
-
 /* Peek summary */
 
 .peek-info {
@@ -256,7 +246,6 @@
   font-size: 18px;
   color: var(--text-h);
 }
-
 
 /* =========================================================
    CART BODY / VIEW SLIDER
@@ -287,7 +276,6 @@
   transform: translateX(-50%);
 }
 
-
 /* Individual screen */
 
 .cart-view {
@@ -307,7 +295,6 @@
   margin: 0;
 }
 
-
 /* =========================================================
    ORDER VIEW
    ========================================================= */
@@ -315,7 +302,6 @@
 .order-view {
   overflow: hidden;
 }
-
 
 /* Scrollable order items */
 
@@ -326,7 +312,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-
 
 /* Order items */
 
@@ -345,7 +330,6 @@
 
   border-bottom: 1px solid var(--border);
 }
-
 
 /* Product information */
 
@@ -366,7 +350,6 @@
   font-size: 13px;
 }
 
-
 /* Quantity controls */
 
 .qty {
@@ -386,14 +369,12 @@
   text-align: center;
 }
 
-
 /* Remove button */
 
 .remove {
   border: none !important;
   padding: 4px 8px !important;
 }
-
 
 /* =========================================================
    ORDER FOOTER
@@ -407,10 +388,9 @@
   gap: 12px;
 
   padding-top: 12px;
-  border-top: 1px dashed black;
+  border-top: 2px dotted black;
   background: var(--bg);
 }
-
 
 /* =========================================================
    TOTALS
@@ -445,7 +425,6 @@
   font-weight: 700;
   color: var(--text-h);
 }
-
 
 /* =========================================================
    CART ACTIONS
@@ -482,105 +461,6 @@
   border-color: #801818;
 }
 
-
-
-
-/* =========================================================
-   CHECKOUT / PAYMENT
-   ========================================================= */
-
-.payment {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-
-/* Payment method buttons */
-
-.method-toggle {
-  display: flex;
-  gap: 8px;
-}
-
-.method-toggle button {
-  flex: 1;
-}
-
-
-/* Payment input */
-
-.payment label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.payment input {
-  padding: 8px;
-
-  font: inherit;
-
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-
-/* Change */
-
-.change {
-  font-weight: 600;
-  color: #2e7d32;
-}
-
-.change.short {
-  color: #c62828;
-}
-
-
-/* =========================================================
-   SALE / STATUS
-   ========================================================= */
-
-.sale-done {
-  display: flex;
-  flex-direction: column;
-
-  padding: 10px 12px;
-
-  border-radius: 8px;
-
-  background: rgba(46, 125, 50, 0.12);
-  color: var(--text-h);
-}
-
-.sale-done button {
-  margin-top: 8px;
-}
-
-.error {
-  color: #c62828;
-  margin: 0;
-}
-
-.empty {
-  opacity: 0.7;
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .cart,
-  .peek-arrow,
-  .cart-views,
-  .cart-backdrop {
-    transition: none;
-  }
-}
-
 /* Cart heading and customer button */
 
 .cart-heading {
@@ -595,7 +475,7 @@
   min-width: 0;
   width: 100%;
   text-align: center;
-  border-bottom: 1px dashed black;
+  border-bottom: 7px double black;
   padding-bottom: 10px;
 }
 
@@ -634,7 +514,7 @@
   border-radius: 12px;
   background: var(--accent-bg);
   margin:10px 0px;
-  
+
 }
 
 .customer-summary-icon {
@@ -675,6 +555,203 @@
   color: var(--text-h);
 }
 
+/* =========================================================
+   CHECKOUT / PAYMENT
+   ========================================================= */
+
+.payment {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Payment method buttons */
+
+.method-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.method-toggle button {
+  flex: 1;
+}
+
+/* Payment input */
+
+.payment label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment input {
+  padding: 8px;
+
+  font: inherit;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+/* Change */
+
+.change {
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.change.short {
+  color: #c62828;
+}
+
+/* =========================================================
+   SALE / STATUS
+   ========================================================= */
+
+.sale-done {
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px 12px;
+
+  border-radius: 8px;
+
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--text-h);
+}
+
+.sale-done button {
+  margin-top: 8px;
+}
+
+.error {
+  color: #c62828;
+  margin: 0;
+}
+
+.empty {
+  opacity: 0.7;
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cart,
+  .peek-arrow,
+  .cart-views,
+  .cart-backdrop {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cart,
+  .peek-arrow,
+  .cart-views,
+  .cart-backdrop {
+    transition: none;
+  }
+}
+
+/* Cart heading and customer button */
+
+.cart-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cart-heading h2 {
+  min-width: 0;
+  width: 100%;
+  text-align: center;
+  border-bottom: 7px double black;
+  padding-bottom: 10px;
+}
+
+.add-customer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 60px;
+  box-sizing: border-box;
+  font-size: 14px !important;
+  padding: 10px 12px !important;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin:10px 0px;
+}
+
+.customer-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Saved customer summary */
+.customer-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--accent-bg);
+  margin:10px 0px;
+
+}
+
+.customer-summary-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.customer-summary-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.customer-summary-info strong {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.customer-summary-info span {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.checkout .customer-edit-btn {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
 
 /* Customer modal */
 
