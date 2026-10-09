@@ -60,3 +60,17 @@
 .settings .hint { margin: 0; font-size: 14px; opacity: 0.75; }
 .settings .error { margin: 0; color: #c62828; }
 .settings .ok { margin: 0; color: #2e7d32; }
+
+.settings .logout-section {
+  border-color: #e0c5c0;
+}
+
+.settings .logout-button {
+  align-self: flex-start;
+  color: #b42318;
+  border-color: #b42318;
+}
+
+.settings .logout-button:hover {
+  background: #fff1ef;
+}

@@ -26,8 +26,9 @@ const TITLES = Object.fromEntries(TABS.map((t) => [t.id, t.label]))
 
 export default function App() {
   const [tab, setTab] = useState('pos')
-  const [authenticated, setAuthenticated] = useState(false)
-  
+  const [authenticated, setAuthenticated] = useState(
+    () => sessionStorage.getItem('ff_authenticated') === 'true'
+  )  
   const handleLogin = (username, password) => {
     // Replace these placeholders with your own credentials.
     const validUsername = 'kristina'
@@ -37,6 +38,8 @@ export default function App() {
       username === validUsername &&
       password === validPassword
     ) {
+      setAuthenticated(true)
+      sessionStorage.setItem('ff_authenticated', 'true')
       setAuthenticated(true)
       return true
     }
@@ -62,7 +65,15 @@ export default function App() {
             {tab === 'orders' && <Orders />}
             {tab === 'products' && <ProductManager />}
             {tab === 'inventory' && <Inventory />}
-            {tab === 'settings' && <Settings />}
+            {tab === 'settings' && (
+              <Settings
+                onLogout={() => {
+                  sessionStorage.removeItem('ff_authenticated')
+                  setAuthenticated(false)
+                  setTab('pos')
+                }}
+              />
+            )}
             </main>
 
             

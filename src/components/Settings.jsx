@@ -12,7 +12,7 @@ import {
 } from '../printer/bluetooth'
 import './Settings.css'
 
-function SettingsForm({ settings }) {
+function SettingsForm({ settings, onLogout }) {
   const [businessName, setBusinessName] = useState(settings.businessName)
   const [receiptHeader, setReceiptHeader] = useState(settings.receiptHeader)
   const [receiptFooter, setReceiptFooter] = useState(settings.receiptFooter)
@@ -20,8 +20,11 @@ function SettingsForm({ settings }) {
 
   const [printerName, setPrinterName] = useState(getPrinterName())
   const [busy, setBusy] = useState(false)
+
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
+
+  
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -140,12 +143,29 @@ function SettingsForm({ settings }) {
 
       {error && <p className="error">{error}</p>}
       {status && <p className="ok">{status}</p>}
+
+      <section className="logout-section">
+        <h2>Account</h2>
+        <p className="hint">
+          Log out of the POS on this device.
+          Your products, orders, and settings will not be deleted.
+        </p>
+        <button
+          type="button"
+          className="logout-button"
+          onClick={onLogout}
+        >
+          Log Out
+        </button>
+      </section>
     </div>
   )
 }
 
-export default function Settings() {
+export default function Settings({ onLogout }) {
   const settings = useSettings()
+
   if (!settings) return <p>Loading…</p>
-  return <SettingsForm settings={settings} />
+
+  return <SettingsForm settings={settings} onLogout={onLogout} />
 }
