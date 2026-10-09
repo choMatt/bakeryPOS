@@ -1,6 +1,6 @@
 import { db } from './db'
 
-export async function createOrder({ items, paymentMethod, amountPaid }) {
+export async function createOrder({ items, paymentMethod, amountPaid, customer = null }) {
   if (items.length === 0) throw new Error('Cart is empty.')
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
@@ -20,6 +20,13 @@ export async function createOrder({ items, paymentMethod, amountPaid }) {
     total,
     amountPaid,
     change: amountPaid - total,
+    customer: customer
+      ? {
+          name: customer.name.trim(),
+          address: customer.address.trim(),
+          contactNumber: customer.contactNumber.trim(),
+        }
+      : null,
   }
 
   return db.transaction('rw', db.orders, db.products, async () => {

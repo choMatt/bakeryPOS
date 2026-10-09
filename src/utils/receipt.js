@@ -54,14 +54,45 @@ export function buildReceipt(order, settings, width = 32) {
       add(t, { ...opts, align: 'center' }),
     )
   const divider = () => add('-'.repeat(width))
+  const doubleDivider = () => add('='.repeat(width))
+  const formatRow = (label, value, width) => {
+    const spaces = Math.max(1, width - label.length - value.length)
+    return label + ' '.repeat(spaces) + value
+  }
+
 
   center(toAscii(settings.businessName).toUpperCase(), { bold: true, large: true })
   String(settings.receiptHeader ?? '')
     .split('\n')
     .forEach((l) => center(toAscii(l)))
-  add()
-
+  
+  doubleDivider()
+  
   add(`Order #${order.id}`)
+  
+  add('')
+  
+  if (order.customer) {
+    if (order.customer.name) {
+      add(
+        formatRow('Client: ', toAscii(order.customer.name), width)
+      )
+    }
+  
+    if (order.customer.address) {
+      add(
+        formatRow('Address: ', toAscii(order.customer.address), width)
+      )
+    }
+  
+    if (order.customer.contactNumber) {
+      add(
+        formatRow('Contact: ', toAscii(order.customer.contactNumber), width)
+      )
+    }
+  }
+
+  add('')
   add(
     toAscii(
       new Date(order.createdAt).toLocaleString('en-PH', {
@@ -83,8 +114,12 @@ export function buildReceipt(order, settings, width = 32) {
   })
   divider()
 
-  add(row('Subtotal', money(order.subtotal ?? order.total), width))
-  add(row('TOTAL', money(order.total), width), { bold: true })
+
+  const totalAmount = money(order.total)
+  const totalRow = row('TOTAL', totalAmount, Math.floor(width / 2))
+  
+  add(totalRow, { bold: true, large: true })
+  
   if (order.paymentMethod === 'cash') {
     add(row('Cash', money(order.amountPaid), width))
     add(row('Change', money(order.change), width))
@@ -95,8 +130,11 @@ export function buildReceipt(order, settings, width = 32) {
 
   center(toAscii(settings.receiptFooter))
   add()
-  return lines
+  return lines 
+
 }
+
+
 
 // Used by the "Test print" button in Settings
 export function sampleOrder() {
@@ -111,7 +149,6 @@ export function sampleOrder() {
     status: 'completed',
     paymentMethod: 'cash',
     items,
-    subtotal: total,
     total,
     amountPaid: 50000,
     change: 50000 - total,

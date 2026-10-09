@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
@@ -7,8 +8,12 @@ import ReceiptDialog from './ReceiptDialog'
 import './Checkout.css'
 import { isTracked, stockStatus } from '../db/inventory'
 
-
-function ProductCatalog({ products, cart, qtyInCart, canAddMore, addToCart }) {
+function ProductCatalog({
+  products,
+  qtyInCart,
+  canAddMore,
+  addToCart,
+}) {
   const visibleProducts = products.filter((p) => p.isActive)
 
   if (visibleProducts.length === 0) {
@@ -62,7 +67,6 @@ function ProductCatalog({ products, cart, qtyInCart, canAddMore, addToCart }) {
   )
 }
 
-
 function CartPeek({ open, itemCount, total, setOpen }) {
   return (
     <button
@@ -102,7 +106,6 @@ function CartPeek({ open, itemCount, total, setOpen }) {
   )
 }
 
-
 function OrderView({
   cart,
   lastSale,
@@ -123,10 +126,70 @@ function OrderView({
   saving,
   canComplete,
   completeSale,
+  customer,
+  showAddCustomer,
+  setShowCustomerModal,
+  
 }) {
   return (
     <div className="cart-view order-view">
-      <h2>Current order</h2>
+      <div className="cart-heading">
+        <h2>Current order</h2>
+      </div>
+      
+      <div className="customer-actions">
+        {!(
+          customer.name.trim() ||
+          customer.address.trim() ||
+          customer.contactNumber.trim()
+        ) && (
+          <button
+            type="button"
+            className="add-customer-btn"
+            onClick={() => setShowCustomerModal(true)}
+          >
+            + Add Customer
+          </button>
+        )}
+      </div>
+      
+      {(
+        customer.name.trim() ||
+        customer.address.trim() ||
+        customer.contactNumber.trim()
+      ) && (
+        <div className="customer-summary">
+          <div className="customer-summary-icon">
+            <span aria-hidden="true">👤</span>
+          </div>
+      
+          <div className="customer-summary-info">
+            <strong>
+              {customer.name.trim() || 'Unnamed customer'}
+            </strong>
+      
+            {(customer.address.trim() ||
+              customer.contactNumber.trim()) && (
+              <span>
+                {[
+                  customer.address.trim(),
+                  customer.contactNumber.trim(),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+            )}
+          </div>
+      
+          <button
+            type="button"
+            className="customer-edit-btn"
+            onClick={() => setShowCustomerModal(true)}
+          >
+            Edit
+          </button>
+        </div>
+      )}
 
       {lastSale && (
         <div className="sale-done">
@@ -137,7 +200,10 @@ function OrderView({
             <span>Change {formatPrice(lastSale.change)}</span>
           )}
 
-          <button onClick={() => setShowReceipt(true)}>
+          <button
+            type="button"
+            onClick={() => setShowReceipt(true)}
+          >
             Print receipt
           </button>
         </div>
@@ -151,6 +217,7 @@ function OrderView({
             <li key={item.productId}>
               <div className="line-info">
                 <span className="line-name">{item.name}</span>
+
                 <span className="line-sub">
                   {formatPrice(item.price)} × {item.qty} ={' '}
                   {formatPrice(item.price * item.qty)}
@@ -159,6 +226,7 @@ function OrderView({
 
               <div className="qty">
                 <button
+                  type="button"
                   onClick={() => changeQty(item.productId, -1)}
                   aria-label={`Decrease ${item.name}`}
                 >
@@ -168,6 +236,7 @@ function OrderView({
                 <span>{item.qty}</span>
 
                 <button
+                  type="button"
                   onClick={() => changeQty(item.productId, 1)}
                   disabled={!canAddMore(item.productId)}
                   aria-label={`Increase ${item.name}`}
@@ -177,6 +246,7 @@ function OrderView({
               </div>
 
               <button
+                type="button"
                 className="remove"
                 onClick={() => removeItem(item.productId)}
                 aria-label={`Remove ${item.name}`}
@@ -200,6 +270,7 @@ function OrderView({
           <div className="method-toggle">
             {['cash', 'gcash'].map((method) => (
               <button
+                type="button"
                 key={method}
                 className={paymentMethod === method ? 'active' : ''}
                 onClick={() => setPaymentMethod(method)}
@@ -223,7 +294,6 @@ function OrderView({
                 />
               </label>
 
-
               {tendered !== '' && (
                 <div className={`change ${hasValidPayment ? '' : 'short'}`}>
                   {hasValidPayment
@@ -241,6 +311,7 @@ function OrderView({
 
         <div className="cart-actions">
           <button
+            type="button"
             className="secondary"
             onClick={clearCart}
             disabled={cart.length === 0 || saving}
@@ -249,13 +320,12 @@ function OrderView({
           </button>
 
           <button
+            type="button"
             className="primary"
             onClick={completeSale}
             disabled={!canComplete}
           >
-            {saving
-              ? 'Saving…'
-              : `Complete`}
+            {saving ? 'Saving…' : 'Complete'}
           </button>
         </div>
       </div>
@@ -263,8 +333,80 @@ function OrderView({
   )
 }
 
+function CustomerModal({ customer, setCustomer, onClose }) {
+  const handleChange = (event) => {
+    const { name, value } = event.target
 
+    setCustomer((current) => ({
+      ...current,
+      [name]: value,
+    }))
+  }
 
+  return (
+    <div
+      className="customer-modal-overlay"
+      onClick={onClose}
+    >
+      <form
+        className="customer-modal"
+        onSubmit={(event) => {
+          event.preventDefault()
+          onClose()
+        }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <h2>Add Customer</h2>
+
+        <p>Enter the customer's details for the receipt.</p>
+
+        <label>
+          Customer name
+          <input
+            name="name"
+            value={customer.name}
+            onChange={handleChange}
+            placeholder="Enter customer name"
+            autoFocus
+          />
+        </label>
+
+        <label>
+          Address
+          <textarea
+            name="address"
+            value={customer.address}
+            onChange={handleChange}
+            placeholder="Enter customer address"
+            rows={3}
+          />
+        </label>
+
+        <label>
+          Contact number
+          <input
+            name="contactNumber"
+            type="tel"
+            inputMode="tel"
+            value={customer.contactNumber}
+            onChange={handleChange}
+            placeholder="Enter contact number"
+          />
+        </label>
+
+        <div className="customer-modal-actions">
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
+
+          <button type="submit" className="primary">
+            Save Customer
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
 
 export default function Checkout() {
   const products = useLiveQuery(
@@ -280,6 +422,13 @@ export default function Checkout() {
   const [lastSale, setLastSale] = useState(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [open, setOpen] = useState(false)
+
+  const [showCustomerModal, setShowCustomerModal] = useState(false)
+  const [customer, setCustomer] = useState({
+    name: '',
+    address: '',
+    contactNumber: '',
+  })
 
   const itemCount = cart.reduce(
     (sum, item) => sum + item.qty,
@@ -373,6 +522,11 @@ export default function Checkout() {
     setCart([])
     setTendered('')
     setError('')
+    setCustomer({
+      name: '',
+      address: '',
+      contactNumber: '',
+    })
   }
 
   const total = cart.reduce(
@@ -407,11 +561,18 @@ export default function Checkout() {
         items: cart,
         paymentMethod,
         amountPaid,
+        customer,
       })
 
       setLastSale(order)
       setCart([])
       setTendered('')
+      setCustomer({
+        name: '',
+        address: '',
+        contactNumber: '',
+      })
+      setShowCustomerModal(false)
       setShowReceipt(true)
     } catch (err) {
       setError(err.message)
@@ -425,7 +586,6 @@ export default function Checkout() {
       <section className="catalog">
         <ProductCatalog
           products={products}
-          cart={cart}
           qtyInCart={qtyInCart}
           canAddMore={canAddMore}
           addToCart={addToCart}
@@ -451,27 +611,30 @@ export default function Checkout() {
           id="cart-body"
           inert={!open}
         >
-            <OrderView
-              cart={cart}
-              lastSale={lastSale}
-              total={total}
-              changeQty={changeQty}
-              removeItem={removeItem}
-              canAddMore={canAddMore}
-              clearCart={clearCart}
-              setShowReceipt={setShowReceipt}
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
-              tendered={tendered}
-              setTendered={setTendered}
-              amountPaid={amountPaid}
-              hasValidPayment={hasValidPayment}
-              change={change}
-              error={error}
-              saving={saving}
-              canComplete={canComplete}
-              completeSale={completeSale}
-            />
+          <OrderView
+            cart={cart}
+            lastSale={lastSale}
+            total={total}
+            changeQty={changeQty}
+            removeItem={removeItem}
+            canAddMore={canAddMore}
+            clearCart={clearCart}
+            setShowReceipt={setShowReceipt}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            tendered={tendered}
+            setTendered={setTendered}
+            amountPaid={amountPaid}
+            hasValidPayment={hasValidPayment}
+            change={change}
+            error={error}
+            saving={saving}
+            canComplete={canComplete}
+            completeSale={completeSale}
+            customer={customer}
+            showAddCustomer={open}
+            setShowCustomerModal={setShowCustomerModal}
+          />
         </div>
 
         {showReceipt && lastSale && (
@@ -481,6 +644,14 @@ export default function Checkout() {
           />
         )}
       </aside>
+
+      {showCustomerModal && (
+        <CustomerModal
+          customer={customer}
+          setCustomer={setCustomer}
+          onClose={() => setShowCustomerModal(false)}
+        />
+      )}
     </div>
   )
 }
