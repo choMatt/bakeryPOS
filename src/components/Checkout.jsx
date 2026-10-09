@@ -223,23 +223,6 @@ function OrderView({
                 />
               </label>
 
-              <div className="quick-cash">
-                <button
-                  onClick={() => setTendered((total / 100).toFixed(2))}
-                  disabled={total === 0}
-                >
-                  Exact
-                </button>
-
-                {[100, 500, 1000].map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => setTendered(String(amount))}
-                  >
-                    ₱{amount}
-                  </button>
-                ))}
-              </div>
 
               {tendered !== '' && (
                 <div className={`change ${hasValidPayment ? '' : 'short'}`}>
@@ -272,7 +255,7 @@ function OrderView({
           >
             {saving
               ? 'Saving…'
-              : `Complete Sale ${total > 0 ? formatPrice(total) : ''}`}
+              : `Complete`}
           </button>
         </div>
       </div>

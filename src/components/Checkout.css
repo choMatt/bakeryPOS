@@ -297,7 +297,6 @@
 
   display: flex;
   flex-direction: column;
-  gap: 12px;
 
   padding: 0 16px 20px;
   overflow-y: auto;
@@ -407,7 +406,7 @@
   gap: 12px;
 
   padding-top: 12px;
-
+  border-top: 1px dashed black;
   background: var(--bg);
 }
 
@@ -492,14 +491,6 @@
 
 .method-toggle button {
   flex: 1;
-}
-
-
-/* Quick cash buttons */
-
-.quick-cash {
-  display: flex;
-  gap: 8px;
 }
 
 
