@@ -487,7 +487,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="checkout">
+    <div className={`checkout ${cart.length > 0 ? 'has-cart' : ''}`}>
       <section className="catalog">
         <ProductCatalog
           products={products}
@@ -498,12 +498,9 @@ export default function Checkout() {
         />
       </section>
 
+      {cart.length > 0 && (
       <aside
-        className={`cart ${
-          open ? 'open' : ''
-        } ${
-          cart.length === 0 ? 'empty-cart' : ''
-        }`}
+        className={`cart ${open ? 'open' : ''}`}
       >
         <CartPeek
           open={open}
@@ -554,13 +551,15 @@ export default function Checkout() {
           </div>
         </div>
 
-        {showReceipt && lastSale && (
-          <ReceiptDialog
-            order={lastSale}
-            onClose={() => setShowReceipt(false)}
-          />
-        )}
       </aside>
+      )}
+
+      {showReceipt && lastSale && (
+        <ReceiptDialog
+          order={lastSale}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
     </div>
   )
 }
