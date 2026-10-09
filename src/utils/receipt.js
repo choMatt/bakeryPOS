@@ -92,19 +92,10 @@ export function buildReceipt(order, settings, width = 32) {
     }
   }
 
-  add('')
-  add(
-    toAscii(
-      new Date(order.createdAt).toLocaleString('en-PH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      }),
-    ),
-  )
-  add(`Payment: ${paymentLabel(order.paymentMethod)}`)
+
+  add(formatRow(`Payment:`, toAscii(paymentLabel(order.paymentMethod)), width))
+
+  
   if (order.status === 'voided') center('*** VOIDED ***', { bold: true })
   divider()
 
@@ -130,6 +121,18 @@ export function buildReceipt(order, settings, width = 32) {
 
   center(toAscii(settings.receiptFooter))
   add()
+
+  add(
+    toAscii(
+      new Date(order.createdAt).toLocaleString('en-PH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      }),
+    ),
+  )
   return lines 
 
 }

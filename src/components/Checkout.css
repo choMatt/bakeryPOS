@@ -128,6 +128,7 @@
   left: 0;
   right: 0;
   bottom: var(--nav-h);
+  
 
   width: 100%;
   max-width: 1126px;
@@ -418,7 +419,20 @@
 .totals {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+}
+
+.payment-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.payment-summary-row strong {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: right;
 }
 
 .totals div {
@@ -579,6 +593,10 @@
 
 .cart-heading h2 {
   min-width: 0;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px dashed black;
+  padding-bottom: 10px;
 }
 
 .add-customer-btn {

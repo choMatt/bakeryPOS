@@ -134,7 +134,7 @@ function OrderView({
   return (
     <div className="cart-view order-view">
       <div className="cart-heading">
-        <h2>Current order</h2>
+        <h2>Order</h2>
       </div>
       
       <div className="customer-actions">
@@ -261,8 +261,33 @@ function OrderView({
       <div className="order-footer">
         <div className="totals">
           <div className="grand">
-            <span>Total</span>
+            <span>Total:</span>
             <span>{formatPrice(total)}</span>
+          </div>
+        
+          <div className="payment-summary-row">
+            <span>Cash:</span>
+            <strong>
+              {formatPrice(
+                tendered.trim() !== '' && !Number.isNaN(amountPaid)
+                  ? amountPaid
+                  : 0
+              )}
+            </strong>
+          </div>
+        
+          <div className="payment-summary-row">
+            <span>Change:</span>
+            <strong>
+              {formatPrice(
+                paymentMethod === 'cash' &&
+                tendered.trim() !== '' &&
+                !Number.isNaN(amountPaid) &&
+                amountPaid >= total
+                  ? amountPaid - total
+                  : 0
+              )}
+            </strong>
           </div>
         </div>
 
@@ -282,27 +307,19 @@ function OrderView({
 
           {paymentMethod === 'cash' && (
             <>
-              <label>
-                Amount received (₱)
+              
                 <input
                   type="number"
                   inputMode="decimal"
+                  placeholder='Cash Given (₱)'
                   min="0"
                   step="0.01"
                   value={tendered}
                   onChange={(event) => setTendered(event.target.value)}
+                  
                 />
-              </label>
 
-              {tendered !== '' && (
-                <div className={`change ${hasValidPayment ? '' : 'short'}`}>
-                  {hasValidPayment
-                    ? `Change: ${formatPrice(change)}`
-                    : `Short by ${formatPrice(
-                        total - (amountPaid || 0),
-                      )}`}
-                </div>
-              )}
+
             </>
           )}
         </div>
