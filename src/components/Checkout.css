@@ -185,7 +185,7 @@
 /* Hide empty cart */
 
 .cart.empty-cart {
-  transform: translateY(100%);
+  transform: translateY(500%);
 }
 
 
@@ -453,6 +453,30 @@
 .cart-actions button {
   flex: 1;
 }
+
+.cart-actions button.primary {
+  background: #568203;
+  border-color: #568203;
+  color: #fff;
+}
+
+.cart-actions button.primary:hover {
+  background: #568203;
+  border-color: #568203;
+}
+
+.cart-actions button.secondary {
+  background: #801818;
+  border-color: #801818;
+  color: #fff;
+}
+
+.cart-actions button.secondary:hover {
+  background: #801818;
+  border-color: #801818;
+}
+
+
 
 
 /* =========================================================
