@@ -8,6 +8,7 @@ import ReceiptDialog from './ReceiptDialog'
 import './Checkout.css'
 import { isTracked, stockStatus } from '../db/inventory'
 
+
 function ProductCatalog({
   products,
   qtyInCart,
@@ -17,24 +18,23 @@ function ProductCatalog({
   const [activeFilter, setActiveFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const activeProducts = products.filter((p) => p.isActive)
+  const activeProducts = products.filter((product) => product.isActive)
 
   const visibleProducts = activeProducts.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchQuery.trim().toLowerCase())
-  
+
     const matchesCategory =
       activeFilter === 'all' ||
       (activeFilter === 'individual' && product.saleType !== 'box') ||
       (activeFilter === 'boxes' && product.saleType === 'box')
-  
+
     return matchesSearch && matchesCategory
   })
 
   return (
     <>
-
       <div className="product-search">
         <input
           type="search"
@@ -44,7 +44,7 @@ function ProductCatalog({
           aria-label="Search products"
         />
       </div>
-      
+
       <div className="product-filters">
         {[
           { label: 'All', value: 'all' },
@@ -69,7 +69,7 @@ function ProductCatalog({
         <p className="empty">
           {activeProducts.length === 0
             ? 'No products to show. Add some in the Products tab.'
-            : 'No products in this category.'}
+            : 'No matching products found.'}
         </p>
       ) : (
         <div className="product-grid">
@@ -80,29 +80,44 @@ function ProductCatalog({
             return (
               <button
                 key={product.id}
+                type="button"
                 className="product-tile"
                 onClick={() => addToCart(product)}
                 disabled={!canAddMore(product.id)}
               >
-                {quantity > 0 && (
-                  <span className="badge">{quantity}</span>
-                )}
-
-                <span className="name">{product.name}</span>
-
-                <span className="meta">
-                  {product.saleType === 'box'
-                    ? `Box of ${product.boxSize}`
-                    : 'Individual'}
+                <span className="product-image">
+                  {product.image ? (
+                    <img src={product.image} alt="" loading="lazy" />
+                  ) : (
+                    <span className="product-image-placeholder">
+                      No image
+                    </span>
+                  )}
                 </span>
 
-                {status !== 'untracked' && (
-                  <span className={`stock ${status}`}>
-                    {status === 'out'
-                      ? 'Sold out'
-                      : `${product.stock} left`}
+                <span className="product-details">
+                  <span className="name">{product.name}</span>
+
+                  <span className="meta">
+                    {product.saleType === 'box'
+                      ? `Box of ${product.boxSize}`
+                      : 'Individual'}
                   </span>
-                )}
+
+                  {status !== 'untracked' && (
+                    <span className={`stock ${status}`}>
+                      {status === 'out'
+                        ? 'Sold out'
+                        : `${product.stock} left`}
+                    </span>
+                  )}
+
+                  {quantity > 0 && (
+                    <span className="product-cart-quantity">
+                      {quantity} in order
+                    </span>
+                  )}
+                </span>
 
                 <span className="price">
                   {formatPrice(product.price)}
@@ -115,6 +130,7 @@ function ProductCatalog({
     </>
   )
 }
+
 
 function CartPeek({ open, itemCount, total, setOpen }) {
   return (
