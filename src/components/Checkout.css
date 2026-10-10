@@ -140,7 +140,7 @@
   border: 1px solid var(--border);
   border-bottom: none;
 
-  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -20px 30px rgba(0, 0, 0, 0.25);
 
   transform: translateY(calc(100% - var(--peek-h)));
   transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
@@ -161,15 +161,16 @@
 
   background:
     radial-gradient(
-      circle at 50% 0,
-      transparent 7px,
-      var(--bg) 7.5px
+      circle at 80% 0,
+      transparent 6px,
+      var(--bg) 5.5px
     );
 
   background-size: 16px 8px;
   background-position: 0 0;
 
   z-index: 1;
+
 }
 
 .cart.open {
@@ -479,19 +480,7 @@
   padding-bottom: 10px;
 }
 
-.add-customer-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 60px;
-  box-sizing: border-box;
-  font-size: 14px !important;
-  padding: 10px 12px !important;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin:10px 0px;
-}
+
 
 .customer-status {
   display: inline-flex;
@@ -534,6 +523,11 @@
   flex-direction: column;
   gap: 3px;
   min-width: 0;
+}
+
+.customer-actions button{
+    background-color: var(--accent);
+    color: white;
 }
 
 .customer-summary-info strong {
