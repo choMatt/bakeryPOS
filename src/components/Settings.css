@@ -74,3 +74,25 @@
 .settings .logout-button:hover {
   background: #fff1ef;
 }
+
+
+.settings .delete-database-section {
+  border-color: #b42318;
+}
+
+.settings .delete-database-section input[type='password'] {
+  padding: 8px;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.settings .delete-database-button {
+  align-self: flex-start;
+  color: #b42318;
+  border-color: #b42318;
+}
+
+.settings .delete-database-button:hover {
+  background: #fff1ef;
+}

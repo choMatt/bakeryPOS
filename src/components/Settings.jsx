@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { db } from '../db/db'
 import { useSettings, saveSettings } from '../db/settings'
 import { buildReceipt, sampleOrder, columnsFor } from '../utils/receipt'
 import { encodeReceipt } from '../printer/escpos'
@@ -23,6 +24,12 @@ function SettingsForm({ settings, onLogout }) {
 
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
+
+  const [deletePassword, setDeletePassword] = useState('')
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const DELETE_DATABASE_PASSWORD = '#330221'
 
   
 
@@ -69,6 +76,47 @@ function SettingsForm({ settings, onLogout }) {
     forgetPrinter()
     setPrinterName('')
     setStatus('')
+  }
+
+  const handleRequestDelete = (e) => {
+    e.preventDefault()
+    setError('')
+    setStatus('')
+  
+    if (deletePassword !== DELETE_DATABASE_PASSWORD) {
+      setError('Incorrect password.')
+      return
+    }
+  
+    setShowDeleteConfirmation(true)
+  }
+  
+  const handleDeleteDatabase = async () => {
+    setDeleting(true)
+    setError('')
+    setStatus('')
+  
+    try {
+      db.close()
+      await db.delete()
+      window.location.reload()
+    } catch (e) {
+      console.error('Database deletion failed:', e)
+  
+      setError(
+        `Failed to delete database: ${e?.message || 'Unknown error'}`,
+      )
+  
+      // Reopen the database so the POS can continue working.
+      try {
+        await db.open()
+      } catch (openError) {
+        console.error('Database reopen failed:', openError)
+      }
+  
+      setDeleting(false)
+      setShowDeleteConfirmation(false)
+    }
   }
 
   return (
@@ -143,6 +191,66 @@ function SettingsForm({ settings, onLogout }) {
 
       {error && <p className="error">{error}</p>}
       {status && <p className="ok">{status}</p>}
+
+      <section className="delete-database-section">
+        <h2>Danger Zone</h2>
+      
+        <p className="hint">
+          Permanently delete all locally stored products, categories,
+          orders, and settings from this device.
+        </p>
+      
+        {!showDeleteConfirmation ? (
+          <form onSubmit={handleRequestDelete}>
+            <label>
+              Enter deletion password
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </label>
+      
+            <button
+              type="submit"
+              className="delete-database-button"
+              disabled={deleting}
+            >
+              Delete Database
+            </button>
+          </form>
+        ) : (
+          <>
+            <p className="error">
+              Are you sure? This action cannot be undone.
+            </p>
+      
+            <div className="row">
+              <button
+                type="button"
+                className="delete-database-button"
+                onClick={handleDeleteDatabase}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete Everything'}
+              </button>
+      
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteConfirmation(false)
+                  setDeletePassword('')
+                }}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        )}
+      </section>
 
       <section className="logout-section">
         <h2>Account</h2>
