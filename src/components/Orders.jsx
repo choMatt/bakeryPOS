@@ -37,6 +37,7 @@ const csvCell = (value) => {
 const downloadOrdersCsv = (orders) => {
   const headers = [
     'Order ID',
+    'Order number',
     'Date',
     'Status',
     'Payment Method',
@@ -52,6 +53,7 @@ const downloadOrdersCsv = (orders) => {
 
   const rows = orders.map((order) => [
     order.id,
+    order.orderNumber ?? '',
     new Date(order.createdAt).toISOString(),
     order.status,
     paymentLabel(order.paymentMethod),
@@ -164,7 +166,7 @@ export default function Orders() {
                   onClick={() => setSelectedId(o.id)}
                 >
                   <div className="row-main">
-                    <strong>Order #{o.id}</strong>
+                    <strong>{o.orderNumber || `Order #${o.id}`}</strong>
                     <span>
                       {date ? formatTime(o.createdAt) : formatDateTime(o.createdAt)} ·{' '}
                       {itemCount(o)} item{itemCount(o) === 1 ? '' : 's'} · {paymentLabel(o.paymentMethod)}
@@ -187,7 +189,7 @@ export default function Orders() {
         ) : (
           <>
             <header>
-              <h2>Order #{selected.id}</h2>
+              <h2>{selected.orderNumber || `Order #${selected.id}`}</h2>
               <span className={`status ${selected.status}`}>{selected.status}</span>
             </header>
             <p className="detail-meta">

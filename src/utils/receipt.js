@@ -68,7 +68,7 @@ export function buildReceipt(order, settings, width = 32) {
   
   doubleDivider()
   
-  add(`Order #${order.id}`)
+  add(order.orderNumber || `Order #${order.id}`)
   
   add('')
   
