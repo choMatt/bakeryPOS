@@ -15,23 +15,36 @@ function ProductCatalog({
   addToCart,
 }) {
   const [activeFilter, setActiveFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const activeProducts = products.filter((p) => p.isActive)
 
   const visibleProducts = activeProducts.filter((product) => {
-    if (activeFilter === 'individual') {
-      return product.saleType !== 'box'
-    }
-
-    if (activeFilter === 'boxes') {
-      return product.saleType === 'box'
-    }
-
-    return true
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchQuery.trim().toLowerCase())
+  
+    const matchesCategory =
+      activeFilter === 'all' ||
+      (activeFilter === 'individual' && product.saleType !== 'box') ||
+      (activeFilter === 'boxes' && product.saleType === 'box')
+  
+    return matchesSearch && matchesCategory
   })
 
   return (
     <>
+
+      <div className="product-search">
+        <input
+          type="search"
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          aria-label="Search products"
+        />
+      </div>
+      
       <div className="product-filters">
         {[
           { label: 'All', value: 'all' },

@@ -114,6 +114,32 @@
   font-weight: 600;
 }
 
+.product-search {
+  margin-bottom: 12px;
+}
+
+.checkout .product-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  outline: none;
+}
+
+.checkout .product-search input:focus {
+  border-color: var(--accent);
+}
+
+.checkout .product-search input::placeholder {
+  color: var(--text-h);
+  opacity: 0.55;
+}
+
+
 /* =========================================================
    CART SHEET
    ========================================================= */
