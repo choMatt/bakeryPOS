@@ -58,6 +58,7 @@ const downloadOrdersCsv = (orders) => {
     new Date(order.createdAt).toISOString(),
     order.status,
     paymentLabel(order.paymentMethod),
+    order.gcashReferenceLast4 ?? '',
     order.customer?.name,
     order.customer?.address,
     order.customer?.contactNumber,
@@ -232,7 +233,13 @@ export default function Orders() {
               <span className={`status ${selected.status}`}>{selected.status}</span>
             </header>
             <p className="detail-meta">
-              {formatDateTime(selected.createdAt)} · {paymentLabel(selected.paymentMethod)}
+                {formatDateTime(selected.createdAt)} · {paymentLabel(selected.paymentMethod)}
+                {selected.paymentMethod === 'gcash' &&
+                  selected.gcashReferenceLast4 && (
+                    <p className="detail-meta">
+                      GCash reference (last 4): {selected.gcashReferenceLast4}
+                    </p>
+                  )}
               </p>
               <button
                 className="print-btn"

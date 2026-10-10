@@ -95,6 +95,19 @@ export function buildReceipt(order, settings, width = 32) {
 
   add(formatRow(`Payment:`, toAscii(paymentLabel(order.paymentMethod)), width))
 
+  if (
+    order.paymentMethod === 'gcash' &&
+    order.gcashReferenceLast4
+  ) {
+    add(
+      formatRow(
+        'Ref (last 4):',
+        order.gcashReferenceLast4,
+        width,
+      ),
+    )
+  }
+
   
   if (order.status === 'voided') center('*** VOIDED ***', { bold: true })
   divider()

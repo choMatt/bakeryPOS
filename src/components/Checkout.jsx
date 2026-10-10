@@ -194,6 +194,8 @@ function OrderView({
   customer,
   showAddCustomer,
   setShowCustomerModal,
+  gcashReferenceLast4,
+  setGcashReferenceLast4,
   
 }) {
   return (
@@ -370,6 +372,32 @@ function OrderView({
             ))}
           </div>
 
+          
+          {paymentMethod === 'gcash' && (
+            <label className="gcash-reference-field">
+              GCash reference number (last 4 digits)
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="e.g. 4821"
+                maxLength={4}
+                pattern="[0-9]{4}"
+                value={gcashReferenceLast4}
+                onChange={(event) =>
+                  setGcashReferenceLast4(
+                    event.target.value.replace(/\D/g, '').slice(0, 4),
+                  )
+                }
+                required
+                aria-describedby="gcash-reference-hint"
+              />
+              <small id="gcash-reference-hint">
+                Enter the last 4 digits shown on the customer's GCash receipt.
+              </small>
+            </label>
+          )}
+
           {paymentMethod === 'cash' && (
             <>
               
@@ -499,6 +527,7 @@ export default function Checkout() {
   const [cart, setCart] = useState([])
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [tendered, setTendered] = useState('')
+  const [gcashReferenceLast4, setGcashReferenceLast4] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [lastSale, setLastSale] = useState(null)
@@ -629,9 +658,14 @@ export default function Checkout() {
     ? amountPaid - total
     : 0
 
+  const hasValidGcashReference =
+    paymentMethod !== 'gcash' ||
+    /^\d{4}$/.test(gcashReferenceLast4)
+  
   const canComplete =
     cart.length > 0 &&
     hasValidPayment &&
+    hasValidGcashReference &&
     !saving
 
   const completeSale = async () => {
@@ -644,10 +678,13 @@ export default function Checkout() {
         paymentMethod,
         amountPaid,
         customer,
+        gcashReferenceLast4:
+          paymentMethod === 'gcash' ? gcashReferenceLast4 : '',
       })
 
       setLastSale(order)
       setCart([])
+      setGcashReferenceLast4('')
       setTendered('')
       setCustomer({
         name: '',
@@ -716,6 +753,8 @@ export default function Checkout() {
             customer={customer}
             showAddCustomer={open}
             setShowCustomerModal={setShowCustomerModal}
+            gcashReferenceLast4={gcashReferenceLast4}
+            setGcashReferenceLast4={setGcashReferenceLast4}
           />
         </div>
 

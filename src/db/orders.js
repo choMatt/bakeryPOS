@@ -6,8 +6,18 @@ export async function createOrder({
   paymentMethod,
   amountPaid,
   customer = null,
+  gcashReferenceLast4 = '',
 }) {
   if (items.length === 0) throw new Error('Cart is empty.')
+
+  if (
+    paymentMethod === 'gcash' &&
+    !/^\d{4}$/.test(gcashReferenceLast4)
+  ) {
+    throw new Error(
+      'Enter the last 4 digits of the GCash reference number.',
+    )
+  }
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
   const total = subtotal // discounts/fees can adjust this later
@@ -47,6 +57,8 @@ export async function createOrder({
       orderNumber,
       status: 'completed',
       paymentMethod,
+      gcashReferenceLast4:
+        paymentMethod === 'gcash' ? gcashReferenceLast4 : '',
 
       // Keep product names and prices unchanged on existing receipts.
       items: items.map(({ productId, name, price, qty }) => ({
