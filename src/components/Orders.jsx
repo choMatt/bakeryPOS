@@ -22,6 +22,75 @@ const formatTime = (ms) =>
 const paymentLabel = (m) => (m === 'gcash' ? 'GCash' : m === 'cash' ? 'Cash' : m)
 const itemCount = (order) => order.items.reduce((sum, i) => sum + i.qty, 0)
 
+
+const csvCell = (value) => {
+  let text = String(value ?? '')
+
+  // Prevent spreadsheet formula injection.
+  if (/^[\s]*[=+\-@]/.test(text)) {
+    text = `'${text}`
+  }
+
+  return `"${text.replace(/"/g, '""')}"`
+}
+
+const downloadOrdersCsv = (orders) => {
+  const headers = [
+    'Order ID',
+    'Date',
+    'Status',
+    'Payment Method',
+    'Customer Name',
+    'Customer Address',
+    'Customer Contact',
+    'Items',
+    'Subtotal',
+    'Total',
+    'Amount Paid',
+    'Change',
+  ]
+
+  const rows = orders.map((order) => [
+    order.id,
+    new Date(order.createdAt).toISOString(),
+    order.status,
+    paymentLabel(order.paymentMethod),
+    order.customer?.name,
+    order.customer?.address,
+    order.customer?.contactNumber,
+    order.items
+      .map((item) => `${item.name} x ${item.qty} @ ${(item.price / 100).toFixed(2)}`)
+      .join('; '),
+    ((order.subtotal ?? order.total) / 100).toFixed(2),
+    (order.total / 100).toFixed(2),
+    ((order.amountPaid ?? 0) / 100).toFixed(2),
+    ((order.change ?? 0) / 100).toFixed(2),
+  ])
+
+  const csv = [
+    headers,
+    ...rows,
+  ]
+    .map((row) => row.map(csvCell).join(','))
+    .join('\r\n')
+
+  const blob = new Blob(['\uFEFF', csv], {
+    type: 'text/csv;charset=utf-8;',
+  })
+
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = `bakery-orders-${todayString()}.csv`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+
 export default function Orders() {
   const [date, setDate] = useState(todayString()) // '' means all dates
   const [selectedId, setSelectedId] = useState(null)
@@ -64,6 +133,13 @@ export default function Orders() {
           </label>
           <button onClick={() => { setDate(todayString()); setSelectedId(null) }}>Today</button>
           <button onClick={() => { setDate(''); setSelectedId(null) }}>All dates</button>
+          <button
+            type="button"
+            onClick={() => downloadOrdersCsv(orders)}
+            disabled={orders.length === 0}
+          >
+            Download CSV
+          </button>
         </div>
 
         <div className="orders-summary">
