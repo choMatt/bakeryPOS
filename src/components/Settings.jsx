@@ -12,6 +12,12 @@ import {
   describePrinterError,
 } from '../printer/bluetooth'
 import './Settings.css'
+import {
+  createBackup,
+  validateBackup,
+  restoreBackup,
+  downloadSafetyBackup,
+} from '../db/backup'
 
 function SettingsForm({ settings, onLogout }) {
   const [businessName, setBusinessName] = useState(settings.businessName)
@@ -30,6 +36,14 @@ function SettingsForm({ settings, onLogout }) {
   const [deleting, setDeleting] = useState(false)
 
   const DELETE_DATABASE_PASSWORD = '#330221'
+
+  const [backupBusy, setBackupBusy] = useState(false)
+  const [backupError, setBackupError] = useState('')
+  const [backupStatus, setBackupStatus] = useState('')
+  const [restorePreview, setRestorePreview] = useState(null)
+  const [restoreFile, setRestoreFile] = useState(null)
+
+  
 
   
 
@@ -119,6 +133,106 @@ function SettingsForm({ settings, onLogout }) {
     }
   }
 
+  
+  const handleCreateBackup = async () => {
+    setBackupBusy(true)
+    setBackupError('')
+    setBackupStatus('')
+    setRestorePreview(null)
+    setRestoreFile(null)
+
+    try {
+      const backup = await createBackup()
+      downloadSafetyBackup // Keep the imported function available for restore.
+      const blob = new Blob(
+        [JSON.stringify(backup, null, 2)],
+        { type: 'application/json' },
+      )
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `ff-pos-backup-${new Date()
+        .toISOString()
+        .slice(0, 10)}.json`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+      setBackupStatus('Backup downloaded. Store a copy somewhere safe.')
+    } catch (e) {
+      setBackupError(`Backup failed: ${e?.message || 'Unknown error'}`)
+    } finally {
+      setBackupBusy(false)
+    }
+  }
+
+  const handleSelectBackup = async (e) => {
+    const file = e.target.files?.[0]
+    setRestorePreview(null)
+    setRestoreFile(null)
+    setBackupError('')
+    setBackupStatus('')
+
+    if (!file) return
+
+    setBackupBusy(true)
+
+    try {
+      const text = await file.text()
+      const backup = JSON.parse(text)
+      const counts = validateBackup(backup)
+
+      setRestoreFile(backup)
+      setRestorePreview({
+        filename: file.name,
+        exportedAt: backup.exportedAt,
+        ...counts,
+      })
+    } catch (e) {
+      setBackupError(
+        `Cannot use this backup: ${e?.message || 'Invalid JSON file.'}`,
+      )
+    } finally {
+      setBackupBusy(false)
+      e.target.value = ''
+    }
+  }
+
+  const handleRestoreBackup = async () => {
+    if (!restoreFile || !restorePreview) return
+
+    const confirmed = window.confirm(
+      'Restoring this backup will replace all current products, categories, orders, and settings. Continue?',
+    )
+
+    if (!confirmed) return
+
+    setBackupBusy(true)
+    setBackupError('')
+    setBackupStatus('')
+
+    try {
+      // Download the current database first so it can be recovered if needed.
+      const currentBackup = await createBackup()
+      downloadSafetyBackup(currentBackup)
+
+      await restoreBackup(restoreFile)
+
+      setBackupStatus(
+        'Restore completed. Reloading the POS to apply the restored data.',
+      )
+      window.setTimeout(() => window.location.reload(), 800)
+    } catch (e) {
+      setBackupError(
+        `Restore failed: ${e?.message || 'Unknown error'}`,
+      )
+    } finally {
+      setBackupBusy(false)
+    }
+  }
+
+
   return (
     <div className="settings">
       <form onSubmit={handleSave}>
@@ -188,6 +302,80 @@ function SettingsForm({ settings, onLogout }) {
           </p>
         )}
       </section>
+
+
+      <section className="backup-section">
+        <h2>Backup &amp; Restore</h2>
+
+        <p className="hint">
+          Download a backup of your products, categories, orders, product
+          images, and settings. Keep a copy outside this device.
+        </p>
+
+        <button
+          type="button"
+          className="primary"
+          onClick={handleCreateBackup}
+          disabled={backupBusy}
+        >
+          {backupBusy ? 'Please wait...' : 'Download Backup'}
+        </button>
+
+        <div className="backup-divider" />
+
+        <h3>Restore from a backup</h3>
+
+        <p className="hint">
+          Select a previously downloaded F&amp;F POS backup file. Review its
+          contents before replacing the current database.
+        </p>
+
+        <label>
+          Backup file (.json)
+          <input
+            type="file"
+            accept=".json,application/json"
+            onChange={handleSelectBackup}
+            disabled={backupBusy}
+          />
+        </label>
+
+        {restorePreview && (
+          <div className="backup-preview">
+            <strong>Backup ready to restore</strong>
+            <p className="hint">{restorePreview.filename}</p>
+            {restorePreview.exportedAt && (
+              <p className="hint">
+                Created: {new Date(restorePreview.exportedAt).toLocaleString()}
+              </p>
+            )}
+            <ul>
+              <li>Products: {restorePreview.products}</li>
+              <li>Categories: {restorePreview.categories}</li>
+              <li>Orders: {restorePreview.orders}</li>
+              <li>Settings: {restorePreview.settings}</li>
+            </ul>
+
+            <p className="error">
+              Restoring replaces the current database. This cannot be undone
+              from inside the POS.
+            </p>
+
+            <button
+              type="button"
+              className="delete-database-button"
+              onClick={handleRestoreBackup}
+              disabled={backupBusy}
+            >
+              {backupBusy ? 'Restoring...' : 'Restore This Backup'}
+            </button>
+          </div>
+        )}
+
+        {backupError && <p className="error">{backupError}</p>}
+        {backupStatus && <p className="ok">{backupStatus}</p>}
+      </section>
+
 
       {error && <p className="error">{error}</p>}
       {status && <p className="ok">{status}</p>}

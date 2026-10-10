@@ -96,3 +96,39 @@
 .settings .delete-database-button:hover {
   background: #fff1ef;
 }
+
+
+.settings .backup-section h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.settings .backup-section input[type='file'] {
+  max-width: 100%;
+  font: inherit;
+}
+
+.settings .backup-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.settings .backup-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.settings .backup-preview p,
+.settings .backup-preview ul {
+  margin: 0;
+}
+
+.settings .backup-preview ul {
+  padding-left: 20px;
+}
