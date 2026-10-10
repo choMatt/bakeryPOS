@@ -115,3 +115,32 @@
 .orders-toolbar button:hover:not(:disabled) {
   border-color: var(--accent);
 }
+
+.orders .void-btn {
+  width: 100%;
+  margin-bottom: 12px;
+  border-color: #b42318;
+  color: #b42318;
+}
+
+.orders .void-btn:hover:not(:disabled) {
+  background: #fff1ef;
+}
+
+.orders .void-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.order-detail .void-details {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #b42318;
+  border-radius: 8px;
+  background: rgba(180, 35, 24, 0.06);
+  overflow-wrap: anywhere;
+}
+
+.order-detail .void-details p {
+  margin-top: 6px;
+}

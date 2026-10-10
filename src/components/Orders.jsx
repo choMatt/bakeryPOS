@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
+import { voidOrder } from '../db/orders'
 import { formatPrice } from '../utils/money'
 import './Orders.css'
 import ReceiptDialog from './ReceiptDialog'
@@ -97,6 +98,9 @@ export default function Orders() {
   const [date, setDate] = useState(todayString()) // '' means all dates
   const [selectedId, setSelectedId] = useState(null)
   const [showReceipt, setShowReceipt] = useState(false)
+  const [voiding, setVoiding] = useState(false)
+  const [voidError, setVoidError] = useState('')
+  const [voidMessage, setVoidMessage] = useState('')
   
 
   const orders = useLiveQuery(() => {
@@ -113,6 +117,41 @@ export default function Orders() {
   if (!orders) return <p>Loading…</p>
 
   const selected = orders.find((o) => o.id === selectedId) ?? null
+
+  const handleVoidOrder = async () => {
+    if (!selected || selected.status !== 'completed' || voiding) return
+  
+    const reason = window.prompt(
+      `Why are you voiding ${selected.orderNumber || `Order #${selected.id}`}?`,
+    )
+  
+    if (reason === null) return
+  
+    if (!reason.trim()) {
+      setVoidError('Please enter a reason for voiding this order.')
+      return
+    }
+  
+    const confirmed = window.confirm(
+      `Void ${selected.orderNumber || `Order #${selected.id}`}?\n\n` +
+        'Tracked inventory will be restored. This cannot be undone from the app.',
+    )
+  
+    if (!confirmed) return
+  
+    setVoiding(true)
+    setVoidError('')
+    setVoidMessage('')
+  
+    try {
+      await voidOrder(selected.id, reason)
+      setVoidMessage('Order voided successfully. Tracked inventory was restored.')
+    } catch (error) {
+      setVoidError(error.message || 'Could not void this order.')
+    } finally {
+      setVoiding(false)
+    }
+  }
 
   const counted = orders.filter((o) => o.status !== 'voided')
   const totalSales = counted.reduce((sum, o) => sum + o.total, 0)
@@ -195,9 +234,38 @@ export default function Orders() {
             <p className="detail-meta">
               {formatDateTime(selected.createdAt)} · {paymentLabel(selected.paymentMethod)}
               </p>
-              <button className="print-btn" onClick={() => setShowReceipt(true)}>
+              <button
+                className="print-btn"
+                onClick={() => setShowReceipt(true)}
+              >
                 Print receipt
               </button>
+              
+              {selected.status === 'completed' && (
+                <button
+                  className="void-btn"
+                  onClick={handleVoidOrder}
+                  disabled={voiding}
+                >
+                  {voiding ? 'Voiding...' : 'Void Order'}
+                </button>
+              )}
+              
+              {selected.status === 'voided' && (
+                <div className="void-details">
+                  <strong>This order has been voided.</strong>
+                  <p>Reason: {selected.voidReason || 'No reason recorded'}</p>
+              
+                  {selected.voidedAt && (
+                    <p>
+                      Voided on: {formatDateTime(selected.voidedAt)}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {voidError && <p className="error">{voidError}</p>}
+              {voidMessage && <p className="ok">{voidMessage}</p>}
 
             <ul className="detail-items">
               {selected.items.map((i, idx) => (

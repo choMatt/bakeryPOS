@@ -93,3 +93,55 @@ export async function createOrder({
     return { id, ...order }
   })
 }
+
+export async function voidOrder(orderId, reason) {
+  const trimmedReason = reason.trim()
+
+  if (!trimmedReason) {
+    throw new Error('A reason is required to void an order.')
+  }
+
+  return db.transaction('rw', db.orders, db.products, async () => {
+    const order = await db.orders.get(orderId)
+
+    if (!order) {
+      throw new Error('Order not found.')
+    }
+
+    if (order.status !== 'completed') {
+      throw new Error('Only completed orders can be voided.')
+    }
+
+    // Combine quantities in case an order contains repeated product IDs.
+    const quantities = new Map()
+
+    for (const item of order.items) {
+      if (item.productId == null) continue
+
+      quantities.set(
+        item.productId,
+        (quantities.get(item.productId) ?? 0) + item.qty,
+      )
+    }
+
+    // Restore tracked inventory inside the same transaction.
+    for (const [productId, quantity] of quantities) {
+      const product = await db.products.get(productId)
+
+      if (!product || product.trackStock !== true) continue
+
+      await db.products.update(productId, {
+        stock: (product.stock ?? 0) + quantity,
+      })
+    }
+
+    await db.orders.update(orderId, {
+      status: 'voided',
+      voidedAt: Date.now(),
+      voidReason: trimmedReason,
+      stockRestored: true,
+    })
+
+    return true
+  })
+}
