@@ -106,3 +106,29 @@
   .bn-item.active { padding-right: 10px; }
   .bn-label { font-size: 13px; }
 }
+
+
+.product-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.checkout .product-filters .product-filter {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.checkout .product-filters .product-filter.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}

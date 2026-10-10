@@ -14,56 +14,92 @@ function ProductCatalog({
   canAddMore,
   addToCart,
 }) {
-  const visibleProducts = products.filter((p) => p.isActive)
+  const [activeFilter, setActiveFilter] = useState('all')
 
-  if (visibleProducts.length === 0) {
-    return (
-      <p className="empty">
-        No products to show. Add some in the Products tab.
-      </p>
-    )
-  }
+  const activeProducts = products.filter((p) => p.isActive)
+
+  const visibleProducts = activeProducts.filter((product) => {
+    if (activeFilter === 'individual') {
+      return product.saleType !== 'box'
+    }
+
+    if (activeFilter === 'boxes') {
+      return product.saleType === 'box'
+    }
+
+    return true
+  })
 
   return (
-    <div className="product-grid">
-      {visibleProducts.map((product) => {
-        const status = stockStatus(product)
-        const quantity = qtyInCart(product.id)
-
-        return (
+    <>
+      <div className="product-filters">
+        {[
+          { label: 'All', value: 'all' },
+          { label: 'Individual', value: 'individual' },
+          { label: 'Boxes', value: 'boxes' },
+        ].map((filter) => (
           <button
-            key={product.id}
-            className="product-tile"
-            onClick={() => addToCart(product)}
-            disabled={!canAddMore(product.id)}
+            key={filter.value}
+            type="button"
+            className={`product-filter ${
+              activeFilter === filter.value ? 'active' : ''
+            }`}
+            onClick={() => setActiveFilter(filter.value)}
+            aria-pressed={activeFilter === filter.value}
           >
-            {quantity > 0 && (
-              <span className="badge">{quantity}</span>
-            )}
-
-            <span className="name">{product.name}</span>
-
-            <span className="meta">
-              {product.saleType === 'box'
-                ? `Box of ${product.boxSize}`
-                : 'Individual'}
-            </span>
-
-            {status !== 'untracked' && (
-              <span className={`stock ${status}`}>
-                {status === 'out'
-                  ? 'Sold out'
-                  : `${product.stock} left`}
-              </span>
-            )}
-
-            <span className="price">
-              {formatPrice(product.price)}
-            </span>
+            {filter.label}
           </button>
-        )
-      })}
-    </div>
+        ))}
+      </div>
+
+      {visibleProducts.length === 0 ? (
+        <p className="empty">
+          {activeProducts.length === 0
+            ? 'No products to show. Add some in the Products tab.'
+            : 'No products in this category.'}
+        </p>
+      ) : (
+        <div className="product-grid">
+          {visibleProducts.map((product) => {
+            const status = stockStatus(product)
+            const quantity = qtyInCart(product.id)
+
+            return (
+              <button
+                key={product.id}
+                className="product-tile"
+                onClick={() => addToCart(product)}
+                disabled={!canAddMore(product.id)}
+              >
+                {quantity > 0 && (
+                  <span className="badge">{quantity}</span>
+                )}
+
+                <span className="name">{product.name}</span>
+
+                <span className="meta">
+                  {product.saleType === 'box'
+                    ? `Box of ${product.boxSize}`
+                    : 'Individual'}
+                </span>
+
+                {status !== 'untracked' && (
+                  <span className={`stock ${status}`}>
+                    {status === 'out'
+                      ? 'Sold out'
+                      : `${product.stock} left`}
+                  </span>
+                )}
+
+                <span className="price">
+                  {formatPrice(product.price)}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </>
   )
 }
 
