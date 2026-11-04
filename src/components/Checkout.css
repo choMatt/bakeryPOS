@@ -1403,3 +1403,17 @@
     margin: 0 auto;
   }
 }
+
+
+/* Keep the checkout cart panel at a consistent width on tablet and desktop */
+@media (min-width: 700px) {
+  .checkout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+
+  .checkout > .cart {
+    width: 360px;
+    min-width: 360px;
+    max-width: 360px;
+  }
+}
