@@ -534,6 +534,26 @@ export default function Checkout() {
   const [showReceipt, setShowReceipt] = useState(false)
   const [open, setOpen] = useState(false)
 
+  const [isTablet, setIsTablet] = useState(
+    () => window.matchMedia('(min-width: 700px)').matches
+  )
+  
+  useEffect(() => {
+    const tabletQuery = window.matchMedia('(min-width: 700px)')
+  
+    const updateTabletMode = () => {
+      setIsTablet(tabletQuery.matches)
+    }
+  
+    tabletQuery.addEventListener('change', updateTabletMode)
+  
+    return () => {
+      tabletQuery.removeEventListener('change', updateTabletMode)
+    }
+  }, [])
+  
+  const cartOpen = isTablet || open
+
   const [showCustomerModal, setShowCustomerModal] = useState(false)
   const [customer, setCustomer] = useState({
     name: '',
@@ -713,22 +733,22 @@ export default function Checkout() {
 
       <aside
         className={`cart ${
-          open ? 'open' : ''
+          cartOpen ? 'open' : ''
         } ${
           cart.length === 0 ? 'empty-cart' : ''
         }`}
       >
         <CartPeek
-          open={open}
+          open={cartOpen}
           itemCount={itemCount}
           total={total}
           setOpen={setOpen}
         />
-
+      
         <div
           className="cart-body"
           id="cart-body"
-          inert={!open}
+          inert={!cartOpen}
         >
           <OrderView
             cart={cart}
@@ -751,7 +771,7 @@ export default function Checkout() {
             canComplete={canComplete}
             completeSale={completeSale}
             customer={customer}
-            showAddCustomer={open}
+            showAddCustomer={cartOpen}
             setShowCustomerModal={setShowCustomerModal}
             gcashReferenceLast4={gcashReferenceLast4}
             setGcashReferenceLast4={setGcashReferenceLast4}
