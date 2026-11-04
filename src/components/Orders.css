@@ -144,3 +144,90 @@
 .order-detail .void-details p {
   margin-top: 6px;
 }
+
+/* Responsive order history */
+.orders,
+.orders-list-panel,
+.order-detail {
+  min-width: 0;
+}
+
+.orders-list .row-main {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.orders-list .row-total {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.order-detail {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .orders {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .orders-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .orders-toolbar label,
+  .orders-toolbar input,
+  .orders-toolbar button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .orders-toolbar label {
+    grid-column: 1 / -1;
+  }
+
+  .orders-summary {
+    gap: 8px;
+  }
+
+  .orders-summary div {
+    min-width: 0;
+    padding: 10px;
+  }
+
+  .orders-summary strong {
+    font-size: clamp(16px, 5vw, 21px);
+    overflow-wrap: anywhere;
+  }
+
+  .orders-list .row {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .row-main span {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .row-total {
+    font-size: 13px;
+  }
+
+  .order-detail {
+    padding: 12px;
+  }
+
+  .order-detail header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .detail-totals div {
+    gap: 12px;
+  }
+}
