@@ -75,3 +75,99 @@
 
 .inventory .empty { opacity: 0.7; }
 .inventory .footnote { margin-top: 16px; font-size: 14px; opacity: 0.7; }
+
+/* Responsive inventory rows and summary cards */
+.inventory {
+  min-width: 0;
+}
+
+.inventory-summary div {
+  min-width: 0;
+}
+
+.inventory-summary span {
+  overflow-wrap: anywhere;
+}
+
+.stock-row .info {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.adjust {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .inventory {
+    padding: 12px;
+  }
+
+  .inventory-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .inventory-summary div {
+    padding: 9px;
+  }
+
+  .inventory-summary span {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .inventory-summary strong {
+    font-size: 20px;
+  }
+
+  .stock-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px 0;
+  }
+
+  .stock-row .info {
+    flex: initial;
+  }
+
+  .level {
+    min-width: 70px;
+  }
+
+  .adjust {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    width: 100%;
+  }
+
+  .adjust input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .adjust button {
+    min-width: 58px;
+  }
+
+  .stock-row .error {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 360px) {
+  .inventory-summary div {
+    padding: 7px;
+  }
+
+  .inventory-summary span {
+    font-size: 10px;
+  }
+
+  .inventory-summary strong {
+    font-size: 18px;
+  }
+}
