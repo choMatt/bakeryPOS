@@ -1211,11 +1211,15 @@
 }
 
 /* Tablet landscape */
-
 @media (min-width: 700px) and (orientation: landscape) {
-  .checkout {
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 36%);
-  }
+    .checkout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 36%);
+      width:100vw;
+      max-width: none;
+      margin: 0;
+      box-sizing: border-box;
+    }
 
   .product-grid {
     grid-template-columns: repeat(
@@ -1223,15 +1227,29 @@
       minmax(165px, 1fr)
     );
   }
-}
 
-@media (min-width: 700px) {
-  .app-main {
-    padding-bottom: 0;
+  /* Only the product catalog scrolls */
+  .catalog {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  .bottom-nav {
-    max-width: 700px;
-    padding: 8px 20px 12px;
+  /* Keep the cart stationary on the right */
+  .cart {
+    position: sticky;
+    top: 20px;
+    align-self: stretch;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+  }
+
+  /* Keep order items independently scrollable */
+  .order-view .cart-lines {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }
